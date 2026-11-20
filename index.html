@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio Virtual de Recepción de Carne · Módulo III · Semana 1</title>
+<style>
+:root{
+  --navy:#12306b; --navy-2:#1d4196; --ink:#0f1b33; --text:#22304a; --muted:#64748b;
+  --bg:#eef2f8; --card:#ffffff; --line:#dbe3ef; --soft:#f6f8fc;
+  --orange:#f05a28; --magenta:#d61f5c;
+  --e1:#b45309; --e2:#dc2626; --e3:#7c3aed; --e4:#16a34a;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+a{color:inherit}
+
+/* Encabezado */
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#12306b 0%,#1d4196 60%,#2a56b8 100%);color:#fff;padding:34px 24px 74px}
+.hero::after{content:"";position:absolute;inset:auto -10% -60px -10%;height:120px;background:var(--bg);border-radius:50% 50% 0 0/100% 100% 0 0}
+.hero .bubble{position:absolute;border-radius:50%;background:rgba(255,255,255,.07)}
+.hero-in{position:relative;z-index:1;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:center}
+@media (max-width:860px){.hero-in{grid-template-columns:1fr}.hero-art{display:none}}
+.brand{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:700;letter-spacing:.3px}
+.brand i{width:8px;height:8px;border-radius:50%;background:linear-gradient(90deg,var(--orange),var(--magenta));display:inline-block}
+.hero h1{margin:14px 0 8px;font-size:clamp(28px,4vw,42px);line-height:1.1;letter-spacing:-.5px}
+.hero h1 span{background:linear-gradient(90deg,#ffb38f,#ff7aa8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{margin:0;color:#dbe6ff;font-size:15.5px;max-width:620px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.stat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:8px 14px}
+.stat b{display:block;font-size:20px}
+.stat span{font-size:12px;color:#c9d7fb}
+.hero-art{display:flex;justify-content:center}
+.wheel{width:260px;height:260px;filter:drop-shadow(0 18px 30px rgba(0,0,0,.25))}
+
+/* Contenedor */
+.wrap{max-width:1180px;margin:-40px auto 0;padding:0 24px 30px;position:relative;z-index:2}
+
+/* Ruta */
+.route{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px rgba(15,27,51,.08);padding:16px 18px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
+@media (max-width:760px){.route{grid-template-columns:1fr}}
+.route h2{margin:0;font-size:15px;color:var(--navy)}
+.route small{color:var(--muted);font-size:12.5px}
+.steps{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.step{display:flex;align-items:center;gap:8px;text-decoration:none;border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--soft);font-weight:700;font-size:13.5px;color:var(--ink);transition:.15s}
+.step:hover{transform:translateY(-1px);border-color:var(--navy-2)}
+.step .n{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px}
+.arrow{color:#94a3b8;font-weight:800}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 4px}
+.f{border:1.5px solid var(--line);background:#fff;color:var(--muted);padding:6px 12px;border-radius:999px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
+.f.on{background:var(--navy);border-color:var(--navy);color:#fff}
+
+/* Secciones */
+section{margin-top:26px}
+.sec-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.sec-head .badge{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:18px;box-shadow:0 6px 14px rgba(0,0,0,.12)}
+.sec-head h2{margin:0;font-size:20px;color:var(--ink)}
+.sec-head p{margin:0;font-size:13.5px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.grid{grid-template-columns:1fr}}
+
+/* Tarjetas */
+.card{position:relative;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 4px 14px rgba(15,27,51,.05);transition:transform .2s,box-shadow .2s,border-color .2s;overflow:hidden}
+.card:hover{transform:translateY(-4px);box-shadow:0 16px 32px rgba(15,27,51,.12);border-color:#b8c8f0}
+.card::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--c)}
+.top{display:flex;align-items:flex-start;gap:12px}
+.ico{flex:none;width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:26px;background:var(--cbg)}
+.card h3{margin:2px 0 0;font-size:16.5px;line-height:1.3;color:var(--ink)}
+.card .sub{font-size:12px;color:var(--muted);font-weight:600}
+.card p{margin:0;font-size:13.5px;color:#475569;flex:1}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--soft);border:1px solid var(--line);color:#475569}
+.tag.book{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:2px}
+.meta span{font-size:12px;color:var(--muted);font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:var(--c);color:#fff;font-weight:700;font-size:13.5px;padding:9px 14px;border-radius:10px;transition:filter .15s,transform .15s;white-space:nowrap}
+.btn:hover{filter:brightness(1.08);transform:translateX(2px)}
+.new{position:absolute;top:14px;right:14px;font-size:10.5px;font-weight:800;letter-spacing:.5px;color:#fff;background:linear-gradient(90deg,var(--orange),var(--magenta));padding:3px 8px;border-radius:999px}
+.visited{display:none;font-size:11px;font-weight:800;color:#16a34a}
+.card.seen .visited{display:inline}
+
+/* Tarjetas destacadas */
+.feature{grid-column:span 3;display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:center;padding:22px;background:linear-gradient(135deg,#ffffff 0%,var(--cbg) 100%)}
+@media (max-width:1000px){.feature{grid-column:span 2}}
+.feature.two{grid-column:span 2}
+@media (max-width:640px){.feature,.feature.two{grid-column:span 1;grid-template-columns:1fr}}
+.feature h3{font-size:20px}
+.feature .points{display:grid;gap:8px;margin-top:16px}
+.feature .pt{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;font-size:13px}
+.feature .pt b{display:block;color:var(--ink);font-size:13.5px}
+
+/* Cómo usar */
+.how{margin-top:30px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:760px){.how{grid-template-columns:1fr}}
+.how div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;font-size:13.5px}
+.how b{display:block;color:var(--navy);margin-bottom:2px}
+footer{max-width:1180px;margin:0 auto;padding:10px 24px 30px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.hidden{display:none!important}
+.wheel{width:280px;height:260px}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="bubble" style="width:280px;height:280px;left:-80px;top:-90px"></div>
+  <div class="bubble" style="width:160px;height:160px;right:8%;top:20px"></div>
+  <div class="hero-in">
+    <div>
+      <span class="brand"><i></i>CECyTE Guanajuato · Módulo III · Productos cárnicos</span>
+      <h1>Laboratorio Virtual de <span>Recepción de Carne</span></h1>
+      <p>Semana 1 · Unidad 1: Recibe la carne para su aceptación o rechazo. Antes de transformar la carne hay que recibirla bien: conoce su origen, cuida la cadena de frío, mide con un termómetro confiable y decide con datos.</p>
+      <div class="stats">
+        <div class="stat"><b>11</b><span>recursos interactivos</span></div>
+        <div class="stat"><b>4</b><span>etapas de aprendizaje</span></div>
+        <div class="stat"><b>A.C.1</b><span>Recibe la carne</span></div>
+      </div>
+    </div>
+    <div class="hero-art">
+      <svg class="wheel" viewBox="0 0 280 260" aria-hidden="true">
+        <defs>
+          <radialGradient id="mt" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#e2626a"/><stop offset=".6" stop-color="#b8303b"/><stop offset="1" stop-color="#7a1520"/></radialGradient>
+          <linearGradient id="ft" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf0"/><stop offset="1" stop-color="#ead9bd"/></linearGradient>
+          <linearGradient id="tr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe3e8"/></linearGradient>
+          <linearGradient id="st" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8d969f"/><stop offset=".45" stop-color="#eef1f4"/><stop offset="1" stop-color="#7c858f"/></linearGradient>
+        </defs>
+        <!-- charola con corte -->
+        <rect x="20" y="132" width="200" height="110" rx="22" fill="url(#tr)"/>
+        <path d="M44 186 C42 156 70 140 112 140 C156 140 196 152 198 182 C200 210 172 226 128 228 C82 230 46 216 44 186Z" fill="url(#ft)"/>
+        <path d="M52 186 C50 162 76 150 112 150 C150 150 186 160 188 182 C190 204 166 218 128 220 C88 222 54 208 52 186Z" fill="url(#mt)"/>
+        <path d="M70 176 C96 170 130 172 170 180 M66 196 C100 192 140 196 180 196" stroke="#f5d9cf" stroke-width="2" opacity=".5" fill="none"/>
+        <ellipse cx="96" cy="166" rx="26" ry="6" fill="#fff" opacity=".25"/>
+        <!-- termómetro -->
+        <g transform="translate(206 120) rotate(28)"><rect x="-2.5" y="0" width="5" height="70" fill="url(#st)"/><rect x="-20" y="-78" width="40" height="80" rx="12" fill="#f3f5f7" stroke="#b6c0ca" stroke-width="2"/><rect x="-14" y="-68" width="28" height="18" rx="3" fill="#c3d3ad"/><text x="0" y="-54" text-anchor="middle" font-size="11" font-weight="800" font-family="monospace" fill="#1d2b1a">3.2</text><circle cx="0" cy="-28" r="6" fill="#cbd5e1"/></g>
+        <!-- iconos -->
+        <g transform="translate(70 70)"><circle r="34" fill="rgba(255,255,255,.18)"/><text x="0" y="11" text-anchor="middle" font-size="32">🚚</text></g>
+        <g transform="translate(150 34)"><circle r="22" fill="rgba(255,255,255,.18)"/><text x="0" y="8" text-anchor="middle" font-size="22">❄️</text></g>
+        <g transform="translate(236 56)"><circle r="20" fill="rgba(255,255,255,.18)"/><text x="0" y="7" text-anchor="middle" font-size="20">📋</text></g>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="route">
+    <div><h2>🧭 Ruta sugerida</h2><small>Sigue el orden de tu CECyBOOK</small></div>
+    <div class="steps">
+      <a class="step" href="#etapa1"><span class="n" style="background:var(--e1)">1</span>Antes del andén</a><span class="arrow">→</span>
+      <a class="step" href="#etapa2"><span class="n" style="background:var(--e2)">2</span>En el andén</a><span class="arrow">→</span>
+      <a class="step" href="#etapa3"><span class="n" style="background:var(--e3)">3</span>La planta</a><span class="arrow">→</span>
+      <a class="step" href="#etapa4"><span class="n" style="background:var(--e4)">4</span>Repaso y evaluación</a>
+    </div>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="f on" data-f="all">Todos</button>
+    <button class="f" data-f="sim">🔬 Simuladores</button>
+    <button class="f" data-f="reto">🎯 Con retos</button>
+    <button class="f" data-f="eval">📝 Evaluación</button>
+  </div>
+
+  <section id="etapa1">
+    <div class="sec-head"><div class="badge" style="background:var(--e1)">1</div><div><h2>Antes del andén: de dónde viene la carne</h2><p>La calidad y la inocuidad se construyen desde la granja, el transporte y el rastro.</p></div></div>
+    <div class="grid">
+      <article class="card" data-k="sim reto" style="--c:#b45309;--cbg:#fef3c7">
+        <div class="top"><div class="ico">❄️</div><div><div class="sub">Simulador <span class="visited">· ✓ visitado</span></div><h3>Cadena de valor y cadena de frío</h3></div></div>
+        <p>Recorre los eslabones del corral al consumidor, rompe la cadena de frío y observa qué les pasa a las bacterias y a la vida útil. Decide si se acepta con las temperaturas de referencia.</p>
+        <div class="tags"><span class="tag book">Figuras 1 y 6</span><span class="tag">Bacterias vs. temperatura</span><span class="tag">Repaso</span></div>
+        <div class="meta"><span>⏱ 15–20 min</span><a class="btn" href="cadena_valor_frio.html">Abrir ➔</a></div>
+      </article>
+      <article class="card" data-k="sim reto" style="--c:#b45309;--cbg:#fef3c7">
+        <div class="top"><div class="ico">🐖</div><div><div class="sub">Simulador <span class="visited">· ✓ visitado</span></div><h3>Del estrés al pH</h3></div></div>
+        <p>Decide cómo se maneja al animal y mira cómo cambian el glucógeno, la caída del pH y la carne que llega al andén: normal, PSE o DFD, en cerdo, res y pollo.</p>
+        <div class="tags"><span class="tag book">Figura 3</span><span class="tag">Completa los espacios</span><span class="tag">PSE y DFD</span></div>
+        <div class="meta"><span>⏱ 20 min</span><a class="btn" href="estres_ph.html">Abrir ➔</a></div>
+      </article>
+      <article class="card" data-k="sim reto eval" style="--c:#b45309;--cbg:#fef3c7">
+        <div class="top"><div class="ico">🩺</div><div><div class="sub">Simulador <span class="visited">· ✓ visitado</span></div><h3>Inspección ante y post mortem</h3></div></div>
+        <p>Ponte en el lugar del médico veterinario: revisa animales vivos en los corrales, inspecciona canal, vísceras y ganglios, y comprueba qué debe traer la carne al llegar a la planta.</p>
+        <div class="tags"><span class="tag book">Figura 4</span><span class="tag">NOM-009-ZOO-1994</span><span class="tag">V/F y clasifica</span></div>
+        <div class="meta"><span>⏱ 25 min</span><a class="btn" href="inspeccion_sanitaria.html">Abrir ➔</a></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="etapa2">
+    <div class="sec-head"><div class="badge" style="background:var(--e2)">2</div><div><h2>En el andén: recibir con criterio</h2><p>Higiene de quien recibe, una medición confiable y la ruta completa de la recepción.</p></div></div>
+    <div class="grid">
+      <article class="card feature" data-k="sim reto eval" style="--c:#dc2626;--cbg:#fee2e2">
+        <div>
+          <div class="top"><div class="ico" style="width:60px;height:60px;font-size:30px">🚚</div><div><div class="sub">Simulador integrador · Práctica 1 <span class="visited">· ✓ visitado</span></div><h3>Andén de recepción virtual</h3></div></div>
+          <p style="margin:10px 0">Recibe camiones como el técnico de la planta: revisa documentos y vehículo, mide bien la temperatura, evalúa el producto con los criterios de la Tabla 1, emite el dictamen con su acción correctiva y regístralo en la bitácora.</p>
+          <div class="tags" style="margin-bottom:12px"><span class="tag book">Figura 2 · Tabla 1 · Práctica 1</span><span class="tag">Bitácora</span><span class="tag">Constancia</span></div>
+          <div class="meta"><span>⏱ 25–30 min</span><a class="btn" href="recepcion_anden.html">Entrar al andén ➔</a></div>
+        </div>
+        <div class="points"><div class="pt">📄<div><b>Documentos y vehículo</b>Remisión, lote, sello y caja limpia y fría.</div></div><div class="pt">🌡️<div><b>Temperatura</b>Tres puntos de la carga, centro térmico.</div></div><div class="pt">✅<div><b>Dictamen y registro</b>Aceptar, condicionar o rechazar, y anotarlo.</div></div></div>
+      </article>
+      <article class="card" data-k="sim reto" style="--c:#dc2626;--cbg:#fee2e2">
+        <div class="top"><div class="ico">🧼</div><div><div class="sub">Simulador <span class="visited">· ✓ visitado</span></div><h3>BPM: ¿quién puede entrar al andén?</h3></div></div>
+        <p>Revisa a tus compañeros en el filtro sanitario, practica el lavado de manos con luz UV y decide en qué momentos del turno hay que repetirlo.</p>
+        <div class="tags"><span class="tag book">Figura 5</span><span class="tag">OMS: cinco claves</span><span class="tag">Lavado de manos</span></div>
+        <div class="meta"><span>⏱ 20 min</span><a class="btn" href="bpm_anden.html">Abrir ➔</a></div>
+      </article>
+      <article class="card" data-k="sim reto eval" style="--c:#dc2626;--cbg:#fee2e2">
+        <div class="top"><div class="ico">🌡️</div><div><div class="sub">Simulador <span class="visited">· ✓ visitado</span></div><h3>El termómetro de punzón</h3></div></div>
+        <p>Verifica el termómetro en baño de hielo, encuentra el centro térmico de la pieza sin tocar hueso y decide con la lectura más desfavorable de la carga.</p>
+        <div class="tags"><span class="tag book">Figura 7 · ejemplo resuelto</span><span class="tag">Cálculos</span><span class="tag">Errores frecuentes</span></div>
+        <div class="meta"><span>⏱ 20 min</span><a class="btn" href="termometro_punzon.html">Abrir ➔</a></div>
+      </article>
+      <article class="card" data-k="info" style="--c:#7c3aed;--cbg:#ede9fe">
+        <div class="top"><div class="ico">🔪</div><div><div class="sub">Para pensar</div><h3>¿Y después del andén?</h3></div></div>
+        <p>La carne aceptada no se queda en la cámara: se corta, se muele, se cura o se cuece. En la etapa 3 verás a dónde va cada lote y por qué la recepción condiciona todo lo demás.</p>
+        <div class="tags"><span class="tag book">Panorama del módulo</span></div>
+        <div class="meta"><span>Antes de pasar a la etapa 3</span><a class="btn" href="#etapa3">Ver la planta ↓</a></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="etapa3">
+    <div class="sec-head"><div class="badge" style="background:var(--e3)">3</div><div><h2>Panorama: la planta de productos cárnicos</h2><p>Lo que pasa con la carne después del andén: áreas, rutas de proceso y derivados.</p></div></div>
+    <div class="grid">
+      <article class="card feature" data-k="sim reto" style="--c:#7c3aed;--cbg:#ede9fe">
+        <div>
+          <div class="top"><div class="ico" style="width:60px;height:60px;font-size:30px">🏭</div><div><div class="sub">Plano interactivo <span class="visited">· ✓ visitado</span></div><h3>Planta de productos cárnicos: áreas y derivados</h3></div></div>
+          <p style="margin:10px 0">Una recepción y cuatro rutas de proceso. Sigue cada derivado por la planta, revisa las áreas y sus temperaturas, calcula el rendimiento del día y busca los peligros en modo auditoría.</p>
+          <div class="tags" style="margin-bottom:12px"><span class="tag book">Panorama del módulo</span><span class="tag">Auditoría</span><span class="tag">Rendimiento</span></div>
+          <div class="meta"><span>⏱ 25 min</span><a class="btn" href="planta_derivados.html">Abrir la planta ➔</a></div>
+        </div>
+        <div class="points"><div class="pt">🗺️<div><b>Rutas</b>Crudos, cocidos, carne seca y nuggets, cada uno con su flujo.</div></div><div class="pt">🌡️<div><b>Áreas y temperaturas</b>Zonas cruda y cocida, cámaras y filtros sanitarios.</div></div><div class="pt">🕵️<div><b>Auditoría</b>8 peligros sanitarios por encontrar.</div></div></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="etapa4">
+    <div class="sec-head"><div class="badge" style="background:var(--e4)">4</div><div><h2>Repaso y evaluación</h2><p>Integra la semana completa, domina el vocabulario en inglés y demuestra que puedes recibir la carne con criterio técnico.</p></div></div>
+    <div class="grid">
+      <article class="card feature two" data-k="eval reto" style="--c:#16a34a;--cbg:#dcfce7">
+        <div>
+          <div class="top"><div class="ico" style="width:60px;height:60px;font-size:30px">🧩</div><div><div class="sub">Actividad autocalificable · Constancia <span class="visited">· ✓ visitado</span></div><h3>Ordena y repasa</h3></div></div>
+          <p style="margin:10px 0">Reto de inicio, ordena la ruta de la recepción (Tabla 7), relaciona la cadena de valor, practica el camino del dato a la acción correctiva, resuelve el caso del camión de las 7:40 y demuestra tu inglés técnico. Al final generas tu constancia en PDF.</p>
+          <div class="tags" style="margin-bottom:12px"><span class="tag book">Tablas 5 y 7</span><span class="tag">Caso integrador</span><span class="tag">Constancia imprimible</span></div>
+          <div class="meta"><span>⏱ 25–30 min</span><a class="btn" href="ordena_repasa.html">Iniciar repaso ➔</a></div>
+        </div>
+        <div class="points"><div class="pt">🔢<div><b>Ordena</b>Documentos → vehículo → producto → decisión → registro.</div></div><div class="pt">🌐<div><b>English corner</b>Glosario, escucha, frases y lectura en inglés.</div></div><div class="pt">🎓<div><b>Demuestra</b>8 actividades, 44 aciertos posibles y tu constancia con folio.</div></div></div>
+      </article>
+      <article class="card" data-k="sim reto" style="--c:#16a34a;--cbg:#dcfce7">
+        <div class="top"><div class="ico">🗣️</div><div><div class="sub">Juegos de vocabulario <span class="visited">· ✓ visitado</span></div><h3>Meat English · Glosario bilingüe</h3></div></div>
+        <p>Voltea tarjetas y escucha la pronunciación, juega memorama, adivina por el oído, resuelve un crucigrama y completa frases técnicas. Colecciona los 8 términos.</p>
+        <div class="tags"><span class="tag book">Tabla 5 · Glosario</span><span class="tag">Crucigrama</span><span class="tag">Pronunciación</span></div>
+        <div class="meta"><span>⏱ 15–20 min</span><a class="btn" href="glosario_ingles.html">Abrir ➔</a></div>
+      </article>
+      <article class="card feature two" data-k="eval reto" style="--c:#16a34a;--cbg:#dcfce7">
+        <div>
+          <div class="top"><div class="ico" style="width:60px;height:60px;font-size:30px">🧭</div><div><div class="sub">Evaluación final <span class="visited">· ✓ visitado</span></div><h3>Recorrido guiado: de la granja al producto terminado</h3></div></div>
+          <p style="margin:10px 0">Elige pollo, cerdo o res y síguelo desde la granja, por el andén de recepción, hasta la planta, donde se convierte en nuggets, jamón cocido o hamburguesa. En cada una de las 13 etapas decides como técnico. Al final generas tu constancia en PDF.</p>
+          <div class="tags" style="margin-bottom:12px"><span class="tag book">A.C.1 Recibe la carne</span><span class="tag">Constancia imprimible</span></div>
+          <div class="meta"><span>⏱ 20–25 min</span><a class="btn" href="recorrido_guiado.html">Iniciar recorrido ➔</a></div>
+        </div>
+        <div class="points"><div class="pt">✅<div><b>Decide</b>Aceptar, condicionar, rechazar o retener con datos.</div></div><div class="pt">🎚️<div><b>Ajusta</b>Ayuno, descanso y temperatura de las cámaras.</div></div><div class="pt">🧮<div><b>Calcula</b>Lecturas del termómetro, rendimiento, salmuera y fórmula.</div></div></div>
+      </article>
+      <article class="card" data-k="sim reto" style="--c:#16a34a;--cbg:#dcfce7">
+        <div class="top"><div class="ico">🎮</div><div><div class="sub">Videojuego <span class="visited">· ✓ visitado</span></div><h3>Andén 4 °C · El inspector de recepción</h3></div></div>
+        <p>Una semana en el andén: lupa para los documentos, linterna en el camión, termógrafo, termómetro de punzón, olfato y tacto. Revisa 18 camiones y juega la Ruta fría, la banda transportadora, la zona de peligro y el jefe final del viernes.</p>
+        <div class="tags"><span class="tag book">Tablas 1, 2 y 7</span><span class="tag book">Camión de las 7:40</span><span class="tag">5 niveles</span></div>
+        <div class="meta"><span>⏱ 30–40 min</span><a class="btn" href="anden_4c.html">Jugar ➔</a></div>
+      </article>
+    </div>
+  </section>
+
+  <div class="how">
+    <div><b>1 · Lee tu CECyBOOK</b>Cada tarjeta indica las figuras y tablas con las que se relaciona.</div>
+    <div><b>2 · Experimenta</b>Cambia una sola variable a la vez y registra lo que observas.</div>
+    <div><b>3 · Demuestra lo aprendido</b>Termina con el recorrido guiado e imprime tu constancia.</div>
+  </div>
+</main>
+
+<footer>
+  <span>CECyTE Guanajuato · CECyBOOK Módulo III · Semana 1 · Unidad 1: Recibe la carne para su aceptación o rechazo</span>
+  <span>Recursos didácticos complementarios</span>
+</footer>
+
+<script>
+// Filtros por tipo de recurso
+document.querySelectorAll('.f').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.f').forEach(x=>x.classList.toggle('on',x===b));
+  const f=b.dataset.f;
+  document.querySelectorAll('article.card').forEach(c=>c.classList.toggle('hidden',f!=='all'&&!c.dataset.k.split(' ').includes(f)));
+  document.querySelectorAll('section').forEach(s=>s.classList.toggle('hidden',!s.querySelector('article.card:not(.hidden)')));
+}));
+// Marca "visitado" en este navegador (opcional; no afecta si el navegador lo bloquea)
+const KEY='m3s1_visitados';
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'[]'); }catch(e){ return []; } }
+function save(v){ try{ localStorage.setItem(KEY,JSON.stringify(v)); }catch(e){} }
+const seen=load();
+document.querySelectorAll('article.card').forEach(c=>{
+  const a=c.querySelector('a.btn'); if(!a) return; const h=a.getAttribute('href'); if(h.startsWith('#')) return;
+  if(seen.includes(h)) c.classList.add('seen');
+  a.addEventListener('click',()=>{ const v=load(); if(!v.includes(h)){ v.push(h); save(v); } });
+});
+</script>
+</body>
+</html>

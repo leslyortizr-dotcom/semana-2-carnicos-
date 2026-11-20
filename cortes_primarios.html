@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cortes primarios · Semana 2</title>
+<style>
+
+
+:root{
+  --navy:#12306b; --navy-2:#1d4196; --ink:#0f1b33; --text:#22304a; --muted:#64748b;
+  --bg:#eef2f8; --card:#ffffff; --line:#dbe3ef; --soft:#f6f8fc;
+  --orange:#f05a28; --magenta:#d61f5c; --meat:#b91c1c; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:var(--text);padding:18px;line-height:1.45}
+.app{max-width:1200px;margin:0 auto;background:var(--card);border-radius:18px;box-shadow:0 12px 34px rgba(15,27,51,.10);overflow:hidden}
+.topbar{height:6px;background:linear-gradient(90deg,var(--meat),var(--orange),var(--magenta))}
+header{padding:16px 24px 6px}
+.back{display:inline-flex;align-items:center;gap:6px;background:#334155;color:#f8fafc;text-decoration:none;padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;border:1px solid #475569;margin-bottom:12px}
+.back:hover{background:#1e293b}
+.title-row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+h1{margin:0;color:var(--navy);font-size:26px;letter-spacing:-.3px}
+.subtitle{color:var(--muted);font-size:14px;margin-top:2px;max-width:820px}
+.week-tag{background:var(--navy);color:#fff;font-weight:700;font-size:12px;padding:6px 12px;border-radius:999px;white-space:nowrap}
+.week-tag b{color:#ffb38f}
+.tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:12px 24px 0}
+@media (max-width:480px){.tabs{grid-template-columns:1fr}}
+.tab{border:2px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;text-align:left;cursor:pointer;font:inherit;color:var(--muted)}
+.tab b{display:block;font-size:15px;color:inherit}
+.tab small{font-size:12.5px}
+.tab.on{border-color:var(--navy);background:#eef3ff;color:var(--navy)}
+.pane{display:none;padding:12px 24px 18px}
+.pane.show{display:block}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.presets .lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px}
+.chip{border:1.5px solid var(--line);background:#fff;color:var(--text);padding:6px 11px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.chip:hover{border-color:var(--navy-2)}
+.chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.dock{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#f8fafc;margin-bottom:12px}
+.dock svg{display:block;width:100%;height:auto}
+@keyframes arrive{from{transform:translateX(560px)}to{transform:translateX(0)}}
+.truck-in{animation:arrive 1.1s cubic-bezier(.2,.8,.2,1)}
+.lab{display:grid;grid-template-columns:290px 1fr;gap:16px}
+@media (max-width:960px){.lab{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.card h3{margin:0 0 8px;font-size:14.5px;color:var(--navy)}
+.info{font-size:12.8px}
+.info div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--line);padding:3px 0}
+.info div:last-child{border:0}
+.info span{color:var(--muted)}
+.info b{text-align:right}
+.bubble{margin-top:8px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:7px 10px;font-size:12.5px;font-weight:600}
+.route{display:flex;flex-direction:column;gap:5px}
+.stn{display:flex;gap:8px;align-items:center;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:6px 9px;font-size:12.8px;font-weight:600;color:var(--muted)}
+.stn i{font-style:normal;width:22px;height:22px;border-radius:50%;background:#e2e8f0;color:#475569;display:inline-flex;align-items:center;justify-content:center;font-size:11px;flex:0 0 auto}
+.stn .sc{margin-left:auto;font-size:11.5px;color:var(--muted)}
+.stn.on{border-color:var(--orange);background:#fff7ed;color:var(--ink)}
+.stn.on i{background:var(--orange);color:#fff}
+.stn.done{color:var(--ink)}
+.stn.done i{background:var(--ok);color:#fff}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.panel>h2{margin:0 0 4px;font-size:18px;color:var(--navy)}
+.panel>.lead{margin:0 0 10px;font-size:13.5px;color:var(--muted)}
+.vis{border:1px solid var(--line);border-radius:12px;background:#fbfcfe;overflow:hidden;margin-bottom:10px}
+.vis svg{display:block;width:100%;height:auto}
+.vis .cap{font-size:11.5px;color:var(--muted);padding:5px 10px;border-top:1px solid var(--line);background:#fff}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:700px){.two{grid-template-columns:1fr}}
+.crit{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.cr{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:7px 10px;background:#fff;font-size:13.2px}
+.cr .tg{display:flex;gap:4px}
+.cr .tg button{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:5px 9px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;color:var(--muted)}
+.cr .tg button.y.on{background:#dcfce7;border-color:var(--ok);color:#14532d}
+.cr .tg button.n.on{background:#fee2e2;border-color:var(--bad);color:#7f1d1d}
+.cr .tg button:disabled{cursor:default}
+.cr .ex{grid-column:1/-1;font-size:12.3px;padding:5px 8px;border-radius:8px}
+.cr .ex.good{background:#f0fdf4;color:#14532d}
+.cr .ex.bad{background:#fef2f2;color:#7f1d1d}
+.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit}
+.btn:disabled{opacity:.45;cursor:default}
+.btn-accent{background:linear-gradient(90deg,var(--orange),var(--magenta));color:#fff}
+.btn-ghost{background:#fff;border:1.5px solid var(--line);color:var(--text)}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-sm{padding:6px 10px;font-size:12.5px}
+.row-btn{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.fb{margin-top:10px;padding:10px 12px;border-radius:10px;font-size:13.2px}
+.fb.good{background:#f0fdf4;border:1px solid #bbf7d0;color:#14532d}
+.fb.bad{background:#fef2f2;border:1px solid #fecaca;color:#7f1d1d}
+.fb.mid{background:#fffbeb;border:1px solid #fde68a;color:#78350f}
+.paper{background:#fffdf7;border:1px solid #e7dcc3;border-radius:10px;padding:12px 14px;font-size:12.8px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.paper h4{margin:0 0 6px;font-size:13px;letter-spacing:.5px;color:#7c5a1d}
+.paper div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dotted #e7dcc3;padding:3px 0}
+.paper span{color:#8a7a5a}
+.seal{display:flex;align-items:center;gap:10px;margin-top:8px}
+.labels{display:flex;flex-direction:column;gap:6px}
+.lbl-card{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;font-size:12.6px}
+.lbl-card b{color:var(--navy)}
+.lbl-card.missing{border-style:dashed;color:var(--bad)}
+.stepbox{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px;background:#fbfcfe}
+.stepbox h4{margin:0 0 6px;font-size:13.5px;color:var(--navy)}
+.stepbox.lock{opacity:.45;pointer-events:none}
+.pos{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.pos button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:7px 10px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;color:var(--text)}
+.pos button.on{border-color:var(--navy);background:#eef3ff;color:var(--navy)}
+.pos button.ok{border-color:var(--ok)}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px}
+.pill.clean{background:#dcfce7;color:#14532d}
+.pill.dirty{background:#fee2e2;color:#7f1d1d}
+.tgt{cursor:pointer}
+.tgt circle{transition:r .15s}
+.tgt:hover circle{r:17}
+table.tb{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff}
+table.tb th{background:var(--navy);color:#fff;text-align:left;padding:6px 8px;font-size:12px}
+table.tb td{border-bottom:1px solid var(--line);padding:6px 8px;vertical-align:top}
+.tbwrap{overflow-x:auto}
+.grp{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;background:#fff}
+.grp h4{margin:0 0 6px;font-size:13.5px;color:var(--ink)}
+.dbtn{display:flex;gap:6px;flex-wrap:wrap}
+.dbtn button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 11px;font-weight:700;font-size:12.8px;cursor:pointer;font-family:inherit;color:var(--text)}
+.dbtn button.on[data-d=acc]{border-color:var(--ok);background:#dcfce7;color:#14532d}
+.dbtn button.on[data-d=cond]{border-color:var(--warn);background:#fef3c7;color:#78350f}
+.dbtn button.on[data-d=rech]{border-color:var(--bad);background:#fee2e2;color:#7f1d1d}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+@media (max-width:700px){.acts{grid-template-columns:1fr}}
+.act{display:flex;gap:8px;align-items:flex-start;border:1.5px solid var(--line);border-radius:10px;padding:7px 9px;background:#fff;font-size:12.8px;cursor:pointer}
+.act input{margin-top:2px}
+.act.on{border-color:var(--navy);background:#eef3ff}
+.act.req{border-color:var(--ok);background:#f0fdf4}
+.act.bad{border-color:var(--bad);background:#fef2f2}
+.chain{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+@media (max-width:700px){.chain{grid-template-columns:1fr}}
+.chain div{background:#fff;border:1px solid var(--line);border-top:4px solid var(--navy);border-radius:10px;padding:7px 9px;font-size:12.3px}
+.chain div:nth-child(2){border-top-color:var(--orange)}
+.chain div:nth-child(3){border-top-color:var(--magenta)}
+.chain div:nth-child(4){border-top-color:var(--ok)}
+.chain b{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.form{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+@media (max-width:700px){.form{grid-template-columns:1fr}}
+.form label{font-size:12px;font-weight:700;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.form input{font:inherit;font-size:14px;padding:7px 9px;border-radius:8px;border:1.5px solid var(--line)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+@media (max-width:800px){.kpis{grid-template-columns:1fr 1fr}}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 10px;text-align:center}
+.kpi small{display:block;font-size:11px;color:var(--muted);font-weight:600}
+.kpi b{font-size:17px;color:var(--navy)}
+.sumbox{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;margin-top:10px}
+.miss{background:#fff7ed;border-left:4px solid var(--orange);padding:7px 10px;border-radius:8px;font-size:12.8px;margin:6px 0}
+details.teacher{margin:0 24px 22px;border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:#fbfcfe;font-size:13.5px}
+details.teacher summary{cursor:pointer;font-weight:700;color:var(--navy)}
+details.teacher li{margin:3px 0}
+footer{padding:0 24px 18px;font-size:11.5px;color:var(--muted)}
+@media print{body{background:#fff;padding:0}.noprint,.tabs,header .back,details.teacher,footer,.pane[data-p=and]{display:none!important}.pane[data-p=bit]{display:block!important}.app{box-shadow:none}}
+
+.ctl{margin-bottom:11px}
+.ctl label{display:flex;justify-content:space-between;align-items:baseline;font-weight:600;font-size:13px;margin-bottom:3px;gap:8px}
+.ctl label .val{font-weight:800;font-size:16px;color:var(--navy);white-space:nowrap}
+.ctl input[type=range]{width:100%;cursor:pointer;accent-color:var(--navy)}
+.scale{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted)}
+.seg{display:flex;background:#e6ecf5;border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;padding:7px 4px;border-radius:8px;font-weight:600;font-size:12px;color:#475569;cursor:pointer;font-family:inherit;line-height:1.2}
+.seg button.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.lg2{display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:6px}.lg2 span{display:inline-flex;align-items:center;gap:4px}.lg2 i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.tabs.four{grid-template-columns:repeat(4,1fr)}
+@media (max-width:900px){.tabs.four{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:480px){.tabs.four{grid-template-columns:1fr}}
+.steps{display:flex;flex-direction:column;gap:6px}
+.chk{display:flex;gap:8px;align-items:center;font-size:13px}
+.legend{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:150px;height:10px;border-radius:5px;background:linear-gradient(90deg,#1d4ed8,#06b6d4 13%,#22c55e 27%,#eab308 47%,#f97316 67%,#dc2626)}
+.tlist{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media (max-width:700px){.tlist{grid-template-columns:1fr 1fr}}
+.tm{border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:8px;text-align:center;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--text)}
+.tm.on{border-color:var(--navy);background:#eef3ff}
+.tm.ok{border-color:var(--ok);background:#f0fdf4}
+.tm.no{border-color:var(--bad);background:#fef2f2}
+.tm small{display:block;font-weight:600;color:var(--muted)}
+.prob{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;margin-bottom:10px}
+.prob h4{margin:0 0 8px;color:var(--navy);font-size:14px}
+.inrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:5px 0;font-size:13.2px}
+.inrow input{width:90px;font:inherit;font-size:14px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--line)}
+.inrow input.good{border-color:var(--ok);background:#f0fdf4}
+.inrow input.bad{border-color:var(--bad);background:#fef2f2}
+.vig{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:start;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;margin-bottom:10px}
+@media (max-width:600px){.vig{grid-template-columns:1fr}}
+.vig svg{width:110px;height:auto;display:block}
+
+.an-br{animation:abr 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+.an-fast{animation-duration:.55s}
+.an-jit{animation:ajit .22s linear infinite;transform-box:fill-box}
+.an-tail{animation:atail 1.8s ease-in-out infinite;transform-box:view-box}
+@keyframes abr{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,1.035)}}
+@keyframes ajit{0%,100%{transform:translateX(0)}25%{transform:translateX(-1.4px)}75%{transform:translateX(1.4px)}}
+@keyframes atail{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg)}}
+@media (prefers-reduced-motion:reduce){.an-br,.an-jit,.an-tail{animation:none}}
+.meters{display:flex;flex-direction:column;gap:8px}
+.meter{font-size:12.5px;font-weight:700;color:var(--text)}
+.meter .bar{height:12px;border-radius:7px;background:#e2e8f0;overflow:hidden;margin-top:3px}
+.meter .bar i{display:block;height:100%;border-radius:7px;transition:width .4s}
+.res-tag{display:inline-block;font-weight:800;border-radius:999px;padding:4px 12px;font-size:13px;color:#fff}
+.lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:800px){.lanes{grid-template-columns:1fr}}
+.fill select{font:inherit;font-size:13.5px;padding:4px 6px;border-radius:8px;border:1.5px solid var(--line);margin:0 3px}
+.fill select.good{border-color:var(--ok);background:#f0fdf4}.fill select.bad{border-color:var(--bad);background:#fef2f2}
+.fill p{margin:8px 0;font-size:14px}
+.samples{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media (max-width:800px){.samples{grid-template-columns:repeat(2,1fr)}}
+.smp{border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:6px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--text)}
+.smp svg{display:block;width:100%;height:auto;border-radius:8px}
+.smp.on{border-color:var(--navy);background:#eef3ff}.smp.ok{border-color:var(--ok)}.smp.no{border-color:var(--bad)}
+
+/* ---------- Estructura del músculo ---------- */
+.stage-wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px}
+@media (max-width:980px){.stage-wrap{grid-template-columns:1fr}}
+.stage{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fbfcfe}
+.stage svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.stage .bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 10px;border-top:1px solid var(--line);background:#fff}
+.stage .bar .sp{flex:1}
+.zoombtn{width:40px;height:40px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-size:20px;font-weight:800;cursor:pointer;color:var(--navy);font-family:inherit}
+.zoombtn:disabled{opacity:.35;cursor:default}
+.ladder{display:flex;flex-direction:column;gap:5px}
+.rung{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:6px 9px;font-size:12.8px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;text-align:left}
+.rung i{font-style:normal;width:26px;height:26px;border-radius:50%;background:#e2e8f0;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:#475569}
+.rung small{font-weight:600;font-size:11px;color:var(--muted)}
+.rung.on{border-color:var(--orange);background:#fff7ed;color:var(--ink)}
+.rung.on i{background:var(--orange);color:#fff}
+.rung.seen i{background:#dcfce7;color:#14532d}
+.rung.on.seen i{background:var(--orange);color:#fff}
+.lvinfo h3{margin:0 0 2px;font-size:17px;color:var(--navy)}
+.lvinfo .size{display:inline-block;background:#eef3ff;color:var(--navy);font-weight:700;font-size:12px;padding:3px 9px;border-radius:999px;margin-bottom:6px}
+.lvinfo p{margin:6px 0;font-size:13.2px}
+.lvinfo .meat{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:7px 10px;font-size:12.8px;color:#7c2d12}
+.lvinfo .ctx{background:#ecfeff;border:1px solid #a5f3fc;border-radius:10px;padding:7px 10px;font-size:12.8px;color:#155e75;margin-top:6px}
+.tog{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 11px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--text)}
+.tog.on{background:#ecfeff;border-color:#06b6d4;color:#155e75}
+.tog.on.lb{background:#eef3ff;border-color:var(--navy);color:var(--navy)}
+#world{transform-box:view-box}
+.zg{transform-box:view-box;transition:transform .75s cubic-bezier(.55,0,.25,1),opacity .75s ease}
+.lbls text{font:700 13px "Segoe UI",system-ui,sans-serif}
+.nolab .lbls{display:none}
+.ctOn .ct{stroke:#06b6d4!important;filter:url(#glowC)}
+.ctOn .ctf{fill:#a5f3fc!important}
+.ctOn .ctTag{display:block}
+.ctTag{display:none}
+.hot{cursor:pointer}
+.hot .ring{animation:pulse 1.6s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{0%{transform:scale(.7);opacity:1}100%{transform:scale(1.5);opacity:0}}
+.sarcCtl{display:none}
+.sarcCtl.show{display:block}
+.head{transition:transform .25s}
+.state{font-size:12.8px;border-radius:10px;padding:7px 10px;margin-top:8px}
+.state.ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#14532d}
+.state.rig{background:#fef2f2;border:1px solid #fecaca;color:#7f1d1d}
+/* composición */
+.waffle{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;max-width:330px}
+.waffle i{aspect-ratio:1;border-radius:4px;background:#e2e8f0;transition:background .35s}
+.cleg{display:flex;flex-direction:column;gap:5px;font-size:13px}
+.cleg div{display:grid;grid-template-columns:16px 1fr auto;gap:8px;align-items:center;padding:5px 8px;border-radius:9px;border:1.5px solid transparent;cursor:pointer}
+.cleg div:hover,.cleg div.on{border-color:var(--line);background:#fff}
+.cleg i{width:16px;height:16px;border-radius:4px}
+.cleg b{font-variant-numeric:tabular-nums}
+.veil{position:relative}
+.veil.hide>.blk{filter:blur(7px);pointer-events:none;user-select:none}
+.veil .msg{display:none;position:absolute;inset:0;align-items:center;justify-content:center;text-align:center;font-weight:800;color:var(--navy);font-size:15px}
+.veil.hide .msg{display:flex}
+.pcards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+@media (max-width:760px){.pcards{grid-template-columns:1fr}}
+.pc{background:#fff;border:1.5px solid var(--line);border-top:5px solid var(--c);border-radius:12px;padding:9px 11px;font-size:12.8px;cursor:pointer;transition:transform .15s}
+.pc:hover{transform:translateY(-2px)}
+.pc.on{border-color:var(--c);background:var(--cb)}
+.pc h4{margin:0 0 3px;font-size:13.5px;color:var(--ink)}
+.pc .pv{font-size:20px;font-weight:900;color:var(--c)}
+.pc ul{margin:5px 0 0;padding-left:17px}
+/* lomo vs pierna */
+.versus{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:760px){.versus{grid-template-columns:1fr}}
+.vcard{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.vcard .vh{padding:9px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.vcard .vh b{color:var(--navy);font-size:15px}
+.vcard .vh span{font-size:12px;color:var(--muted);font-weight:700}
+.vcard svg{display:block;width:100%;height:auto;background:#fbfcfe}
+.vcard .vb{padding:9px 12px}
+.meter{height:12px;border-radius:999px;background:#e2e8f0;overflow:hidden;margin:3px 0 8px}
+.meter i{display:block;height:100%;border-radius:999px;transition:width .8s cubic-bezier(.3,.9,.3,1)}
+.mlab{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--muted)}
+.mlab b{color:var(--ink)}
+.props{font-size:12.6px}
+.props div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--line);padding:3px 0}
+.props div:last-child{border:0}
+.props span{color:var(--muted)}
+.props b{text-align:right}
+.knife{transition:transform .9s cubic-bezier(.5,0,.4,1)}
+/* comprueba */
+.ordbox{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.ordbox button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 11px;font-weight:700;font-size:12.8px;cursor:pointer;font-family:inherit;color:var(--text)}
+.ordbox button:disabled{opacity:.35;cursor:default}
+.seq{display:flex;gap:6px;flex-wrap:wrap;min-height:40px;align-items:center;border:1.5px dashed var(--line);border-radius:10px;padding:6px 8px;background:#fff}
+.seq span{background:var(--navy);color:#fff;border-radius:999px;padding:5px 10px;font-size:12.5px;font-weight:700}
+.seq span.ok{background:var(--ok)}
+.seq span.no{background:var(--bad)}
+.mrow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:6px 9px;background:#fff;margin-bottom:6px;font-size:13px}
+.mrow select{font:inherit;font-size:13px;padding:5px 7px;border-radius:8px;border:1.5px solid var(--line);max-width:100%}
+.mrow.ok{border-color:var(--ok);background:#f0fdf4}
+.mrow.no{border-color:var(--bad);background:#fef2f2}
+.mrow .n{width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:12px}
+.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:860px){.qgrid{grid-template-columns:1fr}}
+.score{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.score .pill{font-size:12.5px}
+.pill.sc{background:#eef3ff;color:var(--navy)}
+
+.pk{display:flex;flex-direction:column;gap:6px}
+.pk button{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;cursor:pointer;font-family:inherit;color:var(--text);text-align:left}
+.pk button b{font-size:13px}.pk button small{font-size:11.5px;color:var(--muted)}
+.pk button.on{border-color:var(--navy);background:#eef3ff}
+.fbar{margin-bottom:8px}
+.fbar .mlab b{font-variant-numeric:tabular-nums}
+.node{cursor:pointer}
+.node:hover .nb{stroke-width:4}
+.arw{cursor:pointer}
+.arw:hover path{stroke-width:5}
+.sel .nb{stroke:#f05a28!important;stroke-width:4.5}
+.arw.sel path{stroke:#f05a28!important}
+#cycInfo h3{font-size:16px}
+.swatch{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:4px}
+.spb{display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:center;font-size:12.8px;margin-bottom:6px}
+.spb .meter{margin:0}
+.tabs.three{grid-template-columns:repeat(3,1fr)}
+@media (max-width:760px){.tabs.three{grid-template-columns:1fr}}
+.kpis.kp7{grid-template-columns:repeat(7,1fr)}
+@media (max-width:900px){.kpis.kp7{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:520px){.kpis.kp7{grid-template-columns:repeat(2,1fr)}}
+#dMeat svg{display:block;width:100%;height:auto}
+.ordbox button{text-align:left}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar"></div>
+  <header>
+    <a class="back" href="index.html">⬅ Volver al Menú Principal</a>
+    <div class="title-row">
+      <div>
+        <h1>🔪 Cortes primarios</h1>
+        <div class="subtitle">Después del sacrificio y la inspección, la canal se divide en cortes primarios por zonas anatómicas. Explora los de bovino (Tabla 2), porcino (NMX-FF-081, Tabla 4) y pollo (NMX-FF-128, Tabla 6): de qué zona son, cuánto trabaja el músculo, qué cortes comerciales se obtienen y cómo se cocinan.</div>
+      </div>
+      <div class="week-tag">Módulo III · Semana 2 · <b>Figura 7 · Tablas 2, 4 y 6</b></div>
+    </div>
+  </header>
+
+  <div class="tabs four">
+    <button class="tab on" data-t="exp"><b>1 · Explora los cortes</b><small>Bovino, porcino y pollo</small></button>
+    <button class="tab" data-t="can"><b>2 · Canales abiertas</b><small>Los cortes vistos en la canal</small></button>
+    <button class="tab" data-t="ret"><b>3 · Encuentra el corte</b><small>Reto de ubicación</small></button>
+    <button class="tab" data-t="coc"><b>4 · ¿De dónde sale?</b><small>Corte de venta → corte primario</small></button>
+  </div>
+
+  <!-- ===================== 1 · EXPLORA ===================== -->
+  <div class="pane show" data-p="exp">
+    <div class="presets"><span class="lbl">Especie</span>
+      <button class="chip on" data-sp="bov">🐄 Bovino</button><button class="chip" data-sp="por">🐖 Porcino</button><button class="chip" data-sp="pol">🐔 Pollo</button>
+      <span class="sp" style="flex:1"></span>
+      <button class="tog" id="tQuart">🔪 Cuartos delantero y trasero</button><button class="tog" id="tWork">💪 Colorear por trabajo del músculo</button><button class="tog on lb" id="tNames">🏷️ Nombres</button>
+    </div>
+    <div class="lab" style="grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr)">
+      <div class="col">
+        <div class="vis" style="margin:0" id="animBox"><svg id="anim" viewBox="0 0 640 370"></svg><div class="cap" id="animCap"></div></div>
+        <div class="cleg" id="workLeg" style="display:none;flex-direction:row;gap:14px;font-size:12.5px"></div>
+      </div>
+      <div class="col">
+        <div class="card lvinfo" id="cutInfo"></div>
+        <div class="card"><h3>📋 Cortes de esta especie</h3><div class="ladder" id="cutList"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CANALES ===================== -->
+  <div class="pane" data-p="can">
+    <div class="presets"><span class="lbl">Canal</span>
+      <button class="chip on" data-csp="bov">🐄 Media canal de bovino</button><button class="chip" data-csp="por">🐖 Media canal de porcino</button><button class="chip" data-csp="pol">🐔 Canal de pollo</button>
+      <span class="sp" style="flex:1"></span>
+      <button class="tog" id="tQuart2">🔪 Cuartos</button><button class="tog" id="tStruct">🦴 Estructuras</button><button class="tog" id="tWork2">💪 Trabajo del músculo</button><button class="tog on lb" id="tNames2">🏷️ Nombres</button>
+    </div>
+    <div class="lab" style="grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr)">
+      <div class="col"><div class="vis" style="margin:0"><svg id="can" viewBox="0 0 640 440"></svg><div class="cap" id="canCap"></div></div></div>
+      <div class="col"><div class="card lvinfo" id="canInfo"></div><div class="card"><h3>📋 Cortes en la canal</h3><div class="ladder" id="canList"></div></div>
+        <div class="bubble">La canal es el cuerpo del animal sacrificado, sangrado y eviscerado, listo para dividirse en cortes. Las de bovino y porcino se parten a lo largo de la columna en dos medias canales.</div></div>
+    </div>
+  </div>
+
+  <!-- ===================== 2 · RETO ===================== -->
+  <div class="pane" data-p="ret">
+    <div class="lab" style="grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr)">
+      <div class="col">
+        <div class="vis" style="margin:0"><svg id="rAnim" viewBox="0 0 640 370"></svg></div>
+      </div>
+      <div class="col">
+        <div class="card" style="text-align:center"><div style="font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.5px">TOCA EN EL DIBUJO</div><div id="rAsk" style="font-size:22px;font-weight:900;color:var(--navy);margin:6px 0"></div><div id="rFb" style="min-height:44px;font-size:13px"></div>
+          <div class="row-btn" style="justify-content:center"><button class="btn btn-ghost btn-sm" id="rSkip">Siguiente →</button><button class="btn btn-ghost btn-sm" id="rRst">↺ Reiniciar</button></div></div>
+        <div class="card"><h3>🎯 Marcador</h3><div class="kpis" style="grid-template-columns:repeat(3,1fr)"><div class="kpi"><small>Pregunta</small><b id="rN">1/12</b></div><div class="kpi"><small>Al primer intento</small><b id="rOk">0</b></div><div class="kpi"><small>Intentos fallidos</small><b id="rBad">0</b></div></div></div>
+        <div class="bubble">Los nombres de los cortes cambian entre países y regiones; aquí se usan nombres comunes en México.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== 3 · COCINA Y EVALUACIÓN ===================== -->
+  <div class="pane" data-p="coc">
+    <div class="qgrid">
+      <div class="panel">
+        <h2>1 · ¿De qué corte primario sale?</h2>
+        <p class="lead">Cada corte de venta sale de una zona de la canal. Elige su corte primario; al revisar verás su zona y su textura.</p>
+        <div class="crit" id="ck"></div>
+      </div>
+      <div class="panel">
+        <h2>2 · ¿Verdadero o falso?</h2>
+        <p class="lead">Sobre cortes, cuartos y normas.</p>
+        <div class="crit" id="vf"></div>
+        <div class="card" style="margin-top:10px"><h3>📏 Normas mexicanas de clasificación</h3>
+          <div class="info"><div><span>Canal de bovino (clasificación)</span><b>NOM-004-SAG/GAN-2018</b></div><div><span>Canal de porcino (cortes y clasificación)</span><b>NMX-FF-081-SCFI-2003</b></div><div><span>Pollo en canal y en piezas</span><b>NMX-FF-128-SCFI-2016</b></div></div></div>
+      </div>
+    </div>
+    <div class="sumbox"><b style="color:var(--navy)">Tu avance en esta pestaña:</b> <span id="totScore">0 de 14 aciertos</span><div class="meter"><i id="totBar" style="width:0;background:linear-gradient(90deg,var(--orange),var(--magenta))"></i></div></div>
+  </div>
+
+  <details class="teacher">
+    <summary>👩‍🏫 Notas para el docente</summary>
+    <ul>
+      <li><b>Relación con el CECyBOOK (versión actualizada):</b> Tabla 2 (cortes primarios y comerciales de la canal de bovino, con base en Calderón Alonso et al., 2021), Tabla 4 (cortes primarios de la canal de porcino según la NMX-FF-081-SCFI-2003) y Tabla 6 (piezas del pollo según la NMX-FF-128-SCFI-2016). Los cortes de bovino y porcino se revisan en clase; el despiece práctico se hace con pollo.</li>
+      <li><b>Bovino:</b> la media canal se divide a la altura de la 12.ª costilla. Cuarto delantero: paleta (<i>chuck</i>), chuletón (<i>rib</i>), y chaleco y pecho; cuarto trasero: pierna o piña (<i>round</i>), lomo corto (<i>short loin</i>), y aldilla o falda (<i>flank</i>). Los cortes comerciales se tomaron de la Tabla 2 tal como aparecen en el libro (por ejemplo, la arrachera y las fajitas se listan en el lomo corto). El botón «Cuartos» colorea cada cuarto.</li>
+      <li><b>Porcino:</b> cinco cortes primarios de la NMX-FF-081: cabeza de lomo, entrecot, costillar, espaldilla y pierna, con su definición resumida. La cabeza, las manitas y el codillo no aparecen como cortes primarios en esa tabla.</li>
+      <li><b>Ojo con el libro:</b> la Figura 7 (cortes primarios de las tres especies) conserva los nombres anteriores (cuello, espaldilla, costillar, falda, chambarete; en cerdo, paleta, lomo, costillar y panza, pecho, codillo y manitas), y el párrafo introductorio todavía menciona la NMX-FF-078-SCFI-2002 para bovino. Este simulador sigue las Tablas 2 y 4; la coloración por trabajo del músculo corresponde a la idea de la Figura 7.</li>
+      <li><b>Trabajo del músculo:</b> el color «bajo, medio, alto» es cualitativo y conecta con el simulador «Viaje al interior del músculo». Las fronteras de los cortes en los dibujos son aproximadas.</li>
+      <li><b>Puntaje:</b> el reto de ubicación tiene 12 preguntas (4 por especie) y la pestaña 4 suma 14 aciertos (9 de corte comercial → corte primario y 5 de verdadero o falso).</li>
+    </ul>
+  </details>
+  <footer>Recurso didáctico complementario · CECyBOOK Módulo III · Semana 2 · 1.7 Cortes primarios de ave, bovino y porcino · Price y Schweigert (1994) · Calderón Alonso et al. (2021) · Secretaría de Economía (2003, 2016).</footer>
+</div>
+<script>
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), lerp=(a,b,t)=>a+(b-a)*t;
+const shuffle=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;};
+function RNG(seed){let s=seed%2147483647;if(s<=0)s+=2147483646;return()=>(s=s*16807%2147483647,(s-1)/2147483646);}
+/* ===== Biblioteca gráfica (de los simuladores de la semana) ===== */
+/* ---------- Gráficos compartidos ---------- */
+let UID=0;
+const GDEFS=`
+ <filter id="fx-fib" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.008 0.24" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 0.6  0 0 0 0 0.25  0 0 0 0 0.22  2.6 0 0 0 -1.2"/><feComposite operator="in" in2="SourceAlpha"/></filter>
+ <filter id="fx-fib2" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.006 0.3" numOctaves="2" seed="9"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 0.92  0 0 0 0 0.88  2.4 0 0 0 -1.35"/><feComposite operator="in" in2="SourceAlpha"/></filter>
+ <filter id="fx-pore" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="turbulence" baseFrequency="0.7" numOctaves="1" seed="2"/><feColorMatrix values="0 0 0 0 0.66  0 0 0 0 0.5  0 0 0 0 0.4  -14 0 0 0 1.4"/><feComposite operator="in" in2="SourceAlpha"/></filter>
+ <filter id="fx-wrin" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.035 0.09" numOctaves="3" seed="7"/><feColorMatrix values="0 0 0 0 0.7  0 0 0 0 0.52  0 0 0 0 0.4  3 0 0 0 -1.55"/><feComposite operator="in" in2="SourceAlpha"/></filter>
+ <filter id="fx-marb" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.11 0.24" numOctaves="2" seed="12"/><feColorMatrix values="0 0 0 0 0.98  0 0 0 0 0.94  0 0 0 0 0.86  14 0 0 0 -9.2"/><feComposite operator="in" in2="SourceAlpha"/></filter>
+ <filter id="fx-grain" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.06 0.5" numOctaves="2" seed="5"/><feColorMatrix values="0 0 0 0 0.3  0 0 0 0 0.03  0 0 0 0 0.05  2 0 0 0 -0.9"/><feComposite operator="in" in2="SourceAlpha"/></filter>
+ <filter id="fx-frost" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="turbulence" baseFrequency="0.55" numOctaves="2" seed="21"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  6 0 0 0 -2.2"/><feComposite operator="in" in2="SourceAlpha"/></filter>
+ <filter id="fx-blot" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="15"/><feColorMatrix values="0 0 0 0 0.52  0 0 0 0 0.56  0 0 0 0 0.46  5 0 0 0 -2.4"/><feComposite operator="in" in2="SourceAlpha"/></filter>
+ <filter id="fx-foam" x="0" y="0" width="100%" height="100%"><feTurbulence type="turbulence" baseFrequency="0.9" numOctaves="1" seed="1"/><feColorMatrix values="0 0 0 0 0.6  0 0 0 0 0.6  0 0 0 0 0.62  -5 0 0 0 1.1"/><feComposite operator="in" in2="SourceAlpha"/></filter>
+ <filter id="fx-kraft" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9 0.06" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 0.42  0 0 0 0 0.28  0 0 0 0 0.12  1.6 0 0 0 -0.62"/><feComposite operator="in" in2="SourceAlpha"/></filter>
+ <filter id="fx-brush" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.004 0.9" numOctaves="2" seed="8"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1.8 0 0 0 -0.75"/><feComposite operator="in" in2="SourceAlpha"/></filter>
+ <filter id="fx-grime" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="4" seed="31"/><feColorMatrix values="0 0 0 0 0.3  0 0 0 0 0.22  0 0 0 0 0.12  6 0 0 0 -2.6"/><feComposite operator="in" in2="SourceAlpha"/></filter>
+ <filter id="fx-blur1"><feGaussianBlur stdDeviation="1"/></filter>
+ <filter id="fx-blur2"><feGaussianBlur stdDeviation="2"/></filter>
+ <filter id="fx-blur4"><feGaussianBlur stdDeviation="4"/></filter>
+ <filter id="fx-blur8"><feGaussianBlur stdDeviation="8"/></filter>
+ <radialGradient id="g-dent"><stop offset="0" stop-color="#5b1a12" stop-opacity=".45"/><stop offset=".7" stop-color="#5b1a12" stop-opacity=".18"/><stop offset="1" stop-color="#5b1a12" stop-opacity="0"/></radialGradient>
+ <radialGradient id="g-pool" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#c2414f" stop-opacity=".75"/><stop offset="1" stop-color="#e5808a" stop-opacity=".45"/></radialGradient>
+ <radialGradient id="g-drop" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset=".35" stop-color="#e7f1fb" stop-opacity=".35"/><stop offset=".85" stop-color="#7e94aa" stop-opacity=".45"/><stop offset="1" stop-color="#506579" stop-opacity=".6"/></radialGradient>
+ <linearGradient id="g-tray" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e8e9e4"/></linearGradient>
+ <linearGradient id="g-glove" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3f6fd8"/><stop offset=".5" stop-color="#7aa5f5"/><stop offset="1" stop-color="#3f6fd8"/></linearGradient>
+ <linearGradient id="g-steel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8d969f"/><stop offset=".45" stop-color="#eef1f4"/><stop offset="1" stop-color="#7c858f"/></linearGradient>
+ <linearGradient id="g-table" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d9dde2"/><stop offset=".5" stop-color="#eef0f2"/><stop offset="1" stop-color="#c9ced4"/></linearGradient>
+ <linearGradient id="g-alu-l" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c3c9d1"/><stop offset="1" stop-color="#e4e8ed"/></linearGradient>
+ <linearGradient id="g-alu-r" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#b9c0c9"/><stop offset="1" stop-color="#dfe4ea"/></linearGradient>
+ <linearGradient id="g-floor" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#9aa2ac"/><stop offset="1" stop-color="#c9cfd6"/></linearGradient>
+ <linearGradient id="g-ceil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d3d8de"/><stop offset="1" stop-color="#eef1f4"/></linearGradient>
+ <linearGradient id="g-kraft" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9b98a"/><stop offset="1" stop-color="#c39c66"/></linearGradient>
+ <linearGradient id="g-film" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".05"/><stop offset=".3" stop-color="#fff" stop-opacity=".45"/><stop offset=".38" stop-color="#fff" stop-opacity=".05"/><stop offset=".7" stop-color="#fff" stop-opacity=".2"/><stop offset=".76" stop-color="#fff" stop-opacity=".02"/><stop offset="1" stop-color="#fff" stop-opacity=".12"/></linearGradient>
+ <linearGradient id="g-drum" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1b4fa5"/><stop offset=".4" stop-color="#4f86e0"/><stop offset="1" stop-color="#173f86"/></linearGradient>
+ <linearGradient id="g-dev" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4b5563"/><stop offset="1" stop-color="#2b323b"/></linearGradient>
+ <linearGradient id="g-wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8a06a"/><stop offset="1" stop-color="#9a7444"/></linearGradient>
+ <pattern id="p-pad" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#fbfbf9"/><path d="M0 0H16M0 0V16" stroke="#e6e6e0" stroke-width="1.2"/></pattern>
+ <pattern id="p-pad-wet" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#fbe3e3"/><path d="M0 0H16M0 0V16" stroke="#efc4c4" stroke-width="1.2"/></pattern>`;
+document.body.insertAdjacentHTML('afterbegin',`<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${GDEFS}</defs></svg>`);
+/* ===================== Gráficos de carne ===================== */
+function meatColors(esp,cat){
+  const C={cerdo:{normal:['#efb2a8','#e2958b','#bf6f66'],pse:['#f7ddd6','#efc9c0','#d9aaa1'],dfd:['#a85a55','#8e4440','#61282a'],tpse:['#f4cbc2','#eab3a9','#cf9187'],tdfd:['#cd827a','#b6655e','#8b4440']},
+   pollo:{normal:['#f7cdbf','#eeb1a1','#d6907f'],pse:['#fbe6de','#f4d4c9','#e3b7aa'],dfd:['#e2998b','#d17f71','#a95a4f'],tpse:['#f9dbd0','#f1c3b5','#dca393'],tdfd:['#eaa898','#dc8f80','#b66b5e']},
+   res:{normal:['#c8414a','#a8202c','#6e1018'],pse:['#d86a70','#c4505a','#8d2a33'],dfd:['#6a2228','#521820','#320c12'],tpse:['#cf555d','#b8363f','#7d1a24'],tdfd:['#8e2a32','#731d26','#4a0f16']}};
+  return C[esp][cat];
+}
+/* ---------- Carne realista (cortes) ---------- */
+const MDEFS=`
+ <filter id="mf-fibD" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency="0.006 0.17" numOctaves="3" seed="4"/><feColorMatrix type="matrix" values="0 0 0 0 0.25  0 0 0 0 0.04  0 0 0 0 0.05  3.2 0 0 0 -1.62"/></filter>
+ <filter id="mf-fibL" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency="0.005 0.21" numOctaves="3" seed="9"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 0.95  0 0 0 0 0.93  -3.4 0 0 0 1.5"/></filter>
+ <filter id="mf-marb" x="0" y="0" width="1" height="1"><feTurbulence type="turbulence" baseFrequency="0.03 0.022" numOctaves="4" seed="11"/><feColorMatrix type="matrix" values="0 0 0 0 0.99  0 0 0 0 0.96  0 0 0 0 0.9  -15 0 0 0 1.25"/><feGaussianBlur stdDeviation=".35"/></filter>
+ <filter id="mf-fleck" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency="0.16" numOctaves="2" seed="21"/><feColorMatrix type="matrix" values="0 0 0 0 0.99  0 0 0 0 0.96  0 0 0 0 0.9  10 0 0 0 -6.9"/></filter>
+ <filter id="mf-mot" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="5"/><feColorMatrix type="matrix" values="0 0 0 0 0.2  0 0 0 0 0.02  0 0 0 0 0.04  2.4 0 0 0 -1.15"/></filter>
+ <filter id="mf-wet" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency="0.035 0.08" numOctaves="2" seed="7" result="n"/><feGaussianBlur in="n" stdDeviation="1" result="b"/><feSpecularLighting in="b" surfaceScale="2.2" specularConstant=".9" specularExponent="38" lighting-color="#ffffff" result="s"><feDistantLight azimuth="235" elevation="52"/></feSpecularLighting><feComposite in="s" in2="SourceAlpha" operator="in"/></filter>
+ <filter id="mf-rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter>
+ <filter id="mf-edge" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="5"/></filter>
+ <pattern id="mf-sarc" width="7" height="10" patternUnits="userSpaceOnUse"><rect width="7" height="10" fill="none"/><rect x="0" width="2.4" height="10" fill="#5b1218" opacity=".55"/><rect x="4.4" width="0.8" height="10" fill="#5b1218" opacity=".35"/></pattern>
+ <linearGradient id="mf-cyl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".18"/><stop offset=".22" stop-color="#fff" stop-opacity=".42"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".32"/></linearGradient>`;
+document.body.insertAdjacentHTML('afterbegin',`<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${MDEFS}</defs></svg>`);
+const MS={
+ cerdo:{o:'M-118,4 C-122,-36 -84,-73 -10,-75 C62,-77 112,-51 119,-14 C123,14 112,34 92,46 C70,60 36,58 10,64 C-24,72 -74,66 -100,44 C-112,34 -117,20 -118,4Z',
+  m:'M-113,5 C-115,-27 -79,-57 -12,-59 C44,-60 89,-46 104,-18 C113,2 108,30 89,41 C67,55 34,54 9,60 C-25,68 -72,62 -97,41 C-108,32 -113,19 -113,5Z',
+  seam:'M56,-50 C44,-20 48,12 68,38', fib:-8, fat:['#fdf9f3','#efe1cf']},
+ res:{o:'M-122,-2 C-124,-44 -88,-76 -24,-74 C26,-86 92,-66 114,-30 C130,0 118,40 84,58 C46,78 -26,78 -74,62 C-104,50 -121,28 -122,-2Z',
+  m:'M-115,0 C-116,-34 -82,-58 -24,-58 C22,-68 80,-52 101,-24 C117,4 111,36 80,53 C46,71 -24,72 -70,57 C-100,46 -114,26 -115,0Z',
+  seam:'M-110,-4 C-84,-30 -34,-38 14,-34 C50,-32 80,-24 104,-10', kern:'M-26,4 C-22,-6 -6,-9 3,-3 C10,3 4,13 -6,14 C-16,15 -29,12 -26,4Z', fib:-15, fat:['#fcf4e2','#e8d3ad']},
+ pollo:{o:'M-124,6 C-124,-34 -88,-62 -30,-64 C26,-66 80,-50 112,-24 C127,-12 129,4 116,14 C96,30 56,48 10,56 C-36,64 -86,58 -110,40 C-121,32 -124,20 -124,6Z',
+  m:null, seam:'M-96,34 C-50,26 20,30 98,6', fib:-24}
+};
+/* cols=[claro,medio,oscuro]; wet 0..1 brillo/exudado; dry 0..1 superficie seca y oscura; pool 0..1 charco de exudado */
+function meatPiece(esp,cols,o={}){
+  const sh=MS[esp], u=++UID, [hi,mid,lo]=cols, wet=o.wet??0.4, dry=o.dry??0, pool=o.pool??0, mus=sh.m||sh.o;
+  let s='';
+  if(pool>0.02) s+=`<defs><radialGradient id="pl${u}" cx=".5" cy=".5" r=".55"><stop offset=".7" stop-color="#e59a95" stop-opacity="${0.25+0.3*pool}"/><stop offset="1" stop-color="#c76660" stop-opacity="${0.4+0.3*pool}"/></radialGradient></defs>
+    <path d="${sh.o}" transform="translate(6,9) scale(${1.03+0.06*pool},${1.05+0.11*pool})" fill="url(#pl${u})"/>
+    <path d="${sh.o}" transform="translate(6,9) scale(${1.03+0.06*pool},${1.05+0.11*pool})" fill="none" stroke="#fff" stroke-width="1.6" opacity="${0.6*pool}" stroke-dasharray="40 26 70 30"/>`;
+  s+=`<path d="${sh.o}" transform="translate(6,14)" fill="#2a1414" opacity=".3" filter="url(#fx-blur4)"/>
+   <path d="${sh.o}" transform="translate(0,7)" fill="${sh.m?sh.fat[1]:lo}"/><path d="${sh.o}" transform="translate(0,7)" fill="#000" opacity=".22"/>
+   <defs><radialGradient id="mg${u}" cx=".4" cy=".36" r=".8"><stop offset="0" stop-color="${hi}"/><stop offset=".6" stop-color="${mid}"/><stop offset="1" stop-color="${lo}"/></radialGradient>
+   <linearGradient id="fg${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sh.fat?sh.fat[0]:'#fff'}"/><stop offset="1" stop-color="${sh.fat?sh.fat[1]:'#eee'}"/></linearGradient>
+   <clipPath id="mc${u}"><path d="${mus}"/></clipPath><clipPath id="oc${u}"><path d="${sh.o}"/></clipPath></defs>`;
+  if(sh.m) s+=`<path d="${sh.o}" fill="url(#fg${u})"/><g clip-path="url(#oc${u})"><rect x="-130" y="-90" width="260" height="180" filter="url(#mf-mot)" opacity=".18"/><path d="${sh.o}" fill="none" stroke="#c9ab86" stroke-width="5" opacity=".5" filter="url(#fx-blur2)"/></g>`;
+  s+=`<g filter="url(#mf-rough)"><path d="${mus}" fill="url(#mg${u})"/><g clip-path="url(#mc${u})">
+   <g transform="rotate(${sh.fib})"><rect x="-150" y="-110" width="300" height="220" filter="url(#mf-fibD)" opacity="${esp==='pollo'?0.14:0.34}"/><rect x="-150" y="-110" width="300" height="220" filter="url(#mf-fibL)" opacity="${esp==='pollo'?0.3:0.18}"/></g>
+   <rect x="-130" y="-90" width="260" height="180" filter="url(#mf-mot)" opacity="${0.18+0.25*dry}"/>`;
+  if(esp==='res') s+=`<rect x="-130" y="-90" width="260" height="180" filter="url(#mf-marb)" opacity=".9"/><rect x="-130" y="-90" width="260" height="180" filter="url(#mf-fleck)" opacity=".8"/>
+   <path d="${sh.kern}" fill="${sh.fat[0]}" opacity=".55" filter="url(#fx-blur2)"/>`;
+  if(sh.seam) s+= esp==='pollo'?`<path d="${sh.seam}" stroke="#fff" stroke-width="1.6" opacity=".45" fill="none"/><path d="${sh.seam}" transform="translate(0,3)" stroke="${lo}" stroke-width="2" opacity=".35" fill="none" filter="url(#fx-blur1)"/>`
+     :`<path d="${sh.seam}" stroke="${sh.fat[0]}" stroke-width="${esp==='res'?6:3}" fill="none" stroke-linecap="round"/><path d="${sh.seam}" stroke="${sh.fat[1]}" stroke-width="${esp==='res'?2:1}" fill="none" transform="translate(1,1.5)"/>`;
+  if(dry>0) s+=`<path d="${mus}" fill="#24060a" opacity="${(esp==='pollo'?0.06:0.14)*dry}"/>`;
+  s+=`<path d="${mus}" fill="none" stroke="${lo}" stroke-width="16" opacity=".5" filter="url(#mf-edge)"/>
+   <rect x="-130" y="-90" width="260" height="180" fill="#fff" filter="url(#mf-wet)" opacity="${0.06+0.6*wet*(1-dry*0.8)}" style="mix-blend-mode:screen"/></g></g>
+   <ellipse cx="-30" cy="-30" rx="${36}" ry="10" transform="rotate(-10)" fill="#fff" opacity="${0.06+0.4*wet*(1-dry)}" filter="url(#fx-blur4)"/>
+   <path d="${sh.o}" fill="none" stroke="${sh.m?'#cdb08d':lo}" stroke-width="1" opacity=".7"/>`;
+  return s;
+}
+const CATFX={normal:{wet:.42,dry:0,pool:0},pse:{wet:1,dry:0,pool:1},dfd:{wet:.02,dry:1,pool:0},tpse:{wet:.75,dry:0,pool:.55},tdfd:{wet:.15,dry:.55,pool:0}};
+function cutSVG(esp,cat,opt={}){
+  const W=opt.w||320,H=opt.h||220, sc=0.66*W/240*(esp==='pollo'?0.96:1), cx=W/2, cy=H/2-4, fx=CATFX[cat], wetPad=cat==='pse'||cat==='tpse';
+  let s=`<svg viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="url(#g-table)"/><rect width="${W}" height="${H}" fill="#fff" filter="url(#fx-brush)" opacity=".45"/>
+   <rect x="${W*0.06+4}" y="${H*0.07+6}" width="${W*0.88}" height="${H*0.84}" rx="22" fill="#000" opacity=".18" filter="url(#fx-blur4)"/>
+   <rect x="${W*0.06}" y="${H*0.07}" width="${W*0.88}" height="${H*0.84}" rx="22" fill="url(#g-tray)" stroke="#d4d6cf" stroke-width="2"/>
+   <rect x="${W*0.1}" y="${H*0.13}" width="${W*0.8}" height="${H*0.72}" rx="14" fill="url(#p-pad${wetPad?'-wet':''})"/>
+   <g transform="translate(${cx},${cy}) scale(${sc})">${meatPiece(esp,meatColors(esp,cat),fx)}</g>`;
+  if(opt.label) s+=`<text x="${W/2}" y="${H-6}" text-anchor="middle" font-size="11" fill="#475569">${opt.label}</text>`;
+  return s+`</svg>`;
+}
+
+/* ===================== Animales (con opciones clínicas) ===================== */
+
+/* ===================== Datos de cortes ===================== */
+const W3={1:['Bajo','#16a34a','#bbf7d0'],2:['Medio','#d97706','#fde68a'],3:['Alto','#dc2626','#fecaca']};
+const SPC={
+ bov:{n:'Bovino',e:'🐄',body:'#7a4a33',cuts:{
+  paleta:{n:'Paleta',en:'chuck',q:'Delantero',w:3,c:'#9b3c3c',zona:'Cuello, hombro y brazo, hasta la mano',tex:'Varios músculos con bastante tejido conectivo',com:'Diezmillo (<i>chuck roll</i>), pulpa de paleta (<i>shoulder clod</i>), cogote (<i>neck</i>), chambarete de mano (<i>fore shank</i>)',uso:'Asado lento, guisos, deshebrar; chambarete en caldo',poly:'106,40 282,40 278,192 200,198 140,200 106,232 M170,262 272,262 272,350 170,350',lab:[196,120]},
+  chuleton:{n:'Chuletón',en:'rib',q:'Delantero',w:1,c:'#c9554b',zona:'Costillas 6 a 12 y el músculo largo del dorso sobre ellas',tex:'Suave y marmoleado',com:'Costilla cargada y costilla corta (<i>short ribs</i>)',uso:'Asar; costillas: horneado o asado lento',poly:'282,40 356,40 356,186 278,192',lab:[318,120]},
+  pecho:{n:'Chaleco y pecho',en:'brisket / plate',q:'Delantero',w:3,c:'#8f3434',zona:'Parte baja del tórax, bajo la paleta y el chuletón',tex:'Dura, con grasa y tejido conectivo',com:'Pecho con o sin hueso (<i>brisket</i>), costillar de aguja (<i>plate</i>)',uso:'Cocer, guisar o ahumar lento',poly:'106,232 140,200 200,198 278,192 356,186 364,292 272,292 272,262 140,262',lab:[250,236]},
+  lomo:{n:'Lomo corto',en:'short loin',q:'Trasero',w:1,c:'#d8665a',zona:'Espalda baja, de la 13.ª costilla a la cadera: casi no trabaja',tex:'La más suave de la canal',com:'Filete (<i>tenderloin</i>), lomo plano (<i>strip loin</i>), palomilla o aguayón (<i>top sirloin</i>), T-bone, arrachera (<i>outside skirt</i>), fajitas (<i>inside skirt</i>)',uso:'Asar o a la plancha, rápido',poly:'356,40 474,40 466,182 356,186',lab:[412,120]},
+  aldilla:{n:'Aldilla o falda',en:'flank',q:'Trasero',w:2,c:'#b9504a',zona:'Pared del abdomen, bajo el lomo',tex:'Fibrosa, de fibras largas',com:'Suadero (<i>rose meat</i>), conchita (<i>flank steak</i>)',uso:'Tacos de suadero; conchita marinada y asada',poly:'356,186 466,182 484,266 480,292 364,292',lab:[420,240]},
+  pierna:{n:'Pierna o piña',en:'round',q:'Trasero',w:2,c:'#a83c37',zona:'Cadera y muslo, hasta el corvejón: locomoción',tex:'Magra, de firme a dura',com:'Pulpa negra (<i>inside round</i>), pulpa bola (<i>knuckle</i>), pulpa blanca o larga (<i>gooseneck</i>), cuete o gusano (<i>eye of round</i>), chambarete (<i>hind shank</i>)',uso:'Bistec, milanesa, cuete mechado, molida; chambarete en caldo',poly:'474,40 620,40 620,266 484,266 466,182 M470,266 620,266 620,350 470,350',lab:[540,160]}}},
+ por:{n:'Porcino',e:'🐖',body:'#e7a99c',cuts:{
+  cablomo:{n:'Cabeza de lomo',w:2,c:'#e3a65a',def:'Porción terminal del músculo gran dorsal que cubre las nueve vértebras cervicales.',zona:'Parte alta del cuello, sobre la espaldilla',tex:'Jugosa, con grasa entreverada',com:'Cabeza de lomo entera o en chuletas',uso:'Asado lento, adobada, al pastor',poly:'120,60 262,60 254,140 138,150 120,150',lab:[190,104]},
+  entrecot:{n:'Entrecot',w:1,c:'#7fae73',def:'Sección dorsal desde la primera costilla hasta una línea ligeramente oblicua que cruza la cuarta vértebra sacra; con hueso.',zona:'Espalda (lomo), sobre las costillas',tex:'Suave y magra',com:'Lomo, chuleta, filete',uso:'Asar, hornear o a la plancha',poly:'262,60 472,60 466,150 254,140',lab:[362,100]},
+  costillar:{n:'Costillar',w:2,c:'#d9887e',def:'Corte lateral del tercio medio de la canal; termina aproximadamente a 5 cm de la última costilla.',zona:'Costillas y vientre (panza)',tex:'Con capas de grasa',com:'Costilla, panza (tocino)',uso:'Costillas al horno; tocino curado y ahumado',poly:'254,140 466,150 458,290 248,290',lab:[356,222]},
+  espaldilla:{n:'Espaldilla',w:2,c:'#8ea0d6',def:'Región del miembro anterior (escápula, húmero, cúbito y radio) hasta la articulación del carpo.',zona:'Hombro y brazo',tex:'Intermedia, jugosa',com:'Paleta, maciza, pulpa de espaldilla',uso:'Carnitas, guisos, asado lento',poly:'138,150 254,140 248,262 240,262 240,330 150,330 150,262 138,262',lab:[196,214]},
+  pierna:{n:'Pierna',w:2,c:'#b98bc9',def:'Región del miembro posterior (pubis, fémur, tibia y peroné) hasta la articulación tibiotarsiana; con hueso.',zona:'Cadera y muslo',tex:'Magra y firme',com:'Pulpa de pierna, jamón',uso:'Hornear, cocer; materia prima del jamón',poly:'472,60 620,60 620,330 476,330 458,290 466,150',lab:[540,170]}}},
+ pol:{n:'Pollo',e:'🐔',body:'#f4d6b4',cuts:{
+  pechuga:{n:'Pechuga',w:1,c:'#f3c9a7',zona:'Músculos pectorales sobre el esternón',tex:'Suave, casi sin tejido conectivo',venta:'Pechuga entera, media pechuga, filete',uso:'Plancha, asado o empanizado',lab:[256,250]},
+  ala:{n:'Ala',w:2,c:'#edc09a',zona:'Extremidad superior unida al tórax; tres secciones de hueso',tex:'Con piel y poca carne',venta:'Ala entera, alitas',uso:'Horneadas, fritas o asadas',lab:[366,186]},
+  muslo:{n:'Muslo',w:2,c:'#e6b28e',zona:'Con base en el fémur, de la rabadilla a la parte alta de la pierna',tex:'Jugoso, más oscuro',venta:'Muslo con o sin hueso',uso:'Horneado, guisado o asado',lab:[430,240]},
+  pierna:{n:'Pierna',w:3,c:'#dea683',zona:'Con base en la tibia, de la rodilla al inicio de la pata',tex:'Más firme, con tendones',venta:'Pierna (piernita)',uso:'Horneada, guisada o frita',lab:[500,296]},
+  huacal:{n:'Huacal',w:2,c:'#ecc8a6',zona:'Parte superior: vértebras torácicas y costillas',tex:'Mucho hueso, poca carne',venta:'Huacal',uso:'Caldos y consomés',lab:[330,148]},
+  rabadilla:{n:'Rabadilla',w:2,c:'#e9bd98',zona:'Vértebras lumbares, cadera y sacro',tex:'Hueso con algo de carne y grasa',venta:'Rabadilla',uso:'Caldos',lab:[506,196]}}}
+};
+let SPx='bov', SEL=null, WORK=false, NAMES=true, QUART=false;
+const QCOL={Delantero:'#5b8f4e',Trasero:'#4f63b0'};
+
+/* ===================== Dibujo de los animales ===================== */
+/* ===================== Dibujo de los animales (versión detallada) ===================== */
+document.body.insertAdjacentHTML('afterbegin',`<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+ <filter id="hair" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9 0.25" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .22 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+ <filter id="pores" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="1" seed="9"/><feColorMatrix values="0 0 0 0 .55  0 0 0 0 .35  0 0 0 0 .2  0 0 0 4 -2.6"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+ <filter id="mus" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.01 0.06" numOctaves="3" seed="12"/><feColorMatrix values="0 0 0 0 .3  0 0 0 0 .04  0 0 0 0 .06  0 0 0 2.2 -1.1"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+ <filter id="bl3"><feGaussianBlur stdDeviation="3"/></filter><filter id="bl6"><feGaussianBlur stdDeviation="6"/></filter>
+ <radialGradient id="cowB" cx=".45" cy=".3" r=".75"><stop offset="0" stop-color="#a5603b"/><stop offset=".65" stop-color="#7c4127"/><stop offset="1" stop-color="#4d2716"/></radialGradient>
+ <radialGradient id="pigB" cx=".45" cy=".3" r=".75"><stop offset="0" stop-color="#fbd3c9"/><stop offset=".6" stop-color="#eeaa9d"/><stop offset="1" stop-color="#c97f73"/></radialGradient>
+ <radialGradient id="chkB" cx=".42" cy=".35" r=".75"><stop offset="0" stop-color="#fff1dc"/><stop offset=".6" stop-color="#f3d2ab"/><stop offset="1" stop-color="#d9a678"/></radialGradient>
+ <linearGradient id="hoof" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f3f46"/><stop offset="1" stop-color="#111827"/></linearGradient>
+ <radialGradient id="meatC" cx=".5" cy=".45" r=".7"><stop offset="0" stop-color="#c9474c"/><stop offset=".7" stop-color="#a62c35"/><stop offset="1" stop-color="#7c1d25"/></radialGradient>
+ <radialGradient id="meatP" cx=".5" cy=".45" r=".7"><stop offset="0" stop-color="#f1aaa0"/><stop offset=".7" stop-color="#e08f84"/><stop offset="1" stop-color="#c06e66"/></radialGradient>
+ <linearGradient id="boneC" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e9dcc2"/><stop offset=".5" stop-color="#fbf6ea"/><stop offset="1" stop-color="#d8c39c"/></linearGradient>
+ <linearGradient id="steelR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e5e7eb"/><stop offset=".5" stop-color="#9ca3af"/><stop offset="1" stop-color="#6b7280"/></linearGradient>
+</defs></svg>`);
+const COW='M38,182 C38,166 44,150 54,138 C62,126 74,116 88,110 C96,106 102,104 108,102 C122,108 134,110 148,106 C172,100 196,94 222,92 C270,92 330,98 384,98 C420,98 452,94 480,90 C506,92 530,98 550,110 C560,126 562,154 556,180 C552,200 546,220 542,240 C546,252 548,262 544,272 C536,286 534,300 534,318 L536,334 L512,336 C512,320 514,302 512,284 C508,268 500,254 490,242 C470,250 444,258 416,262 C376,268 326,270 284,266 C264,264 250,260 240,254 C238,270 236,290 236,318 L238,334 L214,336 C214,318 214,300 212,282 C210,268 206,258 198,248 C186,242 170,236 156,228 C140,220 124,208 108,202 C92,198 74,196 58,194 C46,192 38,190 38,182Z';
+const COWFAR='M246,252 C250,276 252,300 252,318 L254,332 L272,332 C272,314 272,292 270,272 L268,256Z M494,246 C506,262 514,282 516,302 L518,332 L534,332 L532,298 C528,276 520,258 512,246Z';
+const PIG='M40,168 C40,160 44,156 50,156 C58,144 70,132 86,122 C98,112 114,106 130,104 C170,96 230,88 300,86 C370,84 430,88 480,98 C512,106 534,122 546,142 C556,162 556,188 548,208 C540,226 530,240 526,252 C526,272 526,292 526,310 L528,318 L504,320 C502,302 502,284 500,266 C470,272 430,276 380,278 C320,280 268,278 228,272 C222,270 216,266 212,262 C212,280 212,298 214,316 L190,320 C190,300 190,280 188,262 C176,250 162,238 146,228 C126,216 104,206 82,200 C66,196 52,192 44,188 C40,184 40,176 40,168Z';
+const PIGFAR='M220,262 L224,312 L240,312 L238,268Z M480,262 C486,280 488,298 488,312 L504,312 L502,262Z';
+const SHADOW='<ellipse cx="320" cy="340" rx="300" ry="16" fill="#000" opacity=".1" filter="url(#bl6)"/>';
+function regionFill(sp,k){ const c=SPC[sp].cuts[k]; return WORK?W3[c.w][1]:(QUART&&c.q)?QCOL[c.q]:c.c; }
+function regionsLayer(sp,cuts,clip,o,polyKey='poly',alpha=.58){
+  return Object.entries(cuts).filter(([k,c])=>c[polyKey]).map(([k,c])=>{ const on=o.sel===k, fl=o.flash&&o.flash.k===k;
+    const polys=c[polyKey].split(' M').map(p=>`<polygon points="${p.replace('M','')}"/>`).join('');
+    const col=fl?(o.flash.ok?'#22c55e':'#ef4444'):regionFill(sp,k), op=o.plain&&!fl?0:(fl?.85:on?.9:(WORK?.72:alpha));
+    return `<g class="rg" data-k="${k}" clip-path="url(#${clip})" style="cursor:pointer"><g fill="${col}" opacity="${op}" style="mix-blend-mode:${WORK||fl?'normal':'multiply'}">${polys}</g>${on?`<g fill="#fff" opacity=".22">${polys}</g>`:''}</g>`; }).join('')+
+   (o.plain?'':`<g clip-path="url(#${clip})" fill="none" stroke="#fff" stroke-width="2.2" stroke-dasharray="7 4" opacity=".95" pointer-events="none">${Object.values(cuts).filter(c=>c[polyKey]).map(c=>c[polyKey].split(' M').map(p=>`<polygon points="${p.replace('M','')}"/>`).join('')).join('')}</g>`);
+}
+function labels(cuts,key='lab',key2='lab2'){
+  if(!NAMES) return '';
+  let s=''; Object.values(cuts).forEach(c=>[c[key],c[key2]].filter(Boolean).forEach(([x,y])=>{ const t=c.n.replace(' (pescuezo)',''), w=t.length*6.6+14;
+    s+=`<g pointer-events="none"><rect x="${x-w/2}" y="${y-11}" width="${w}" height="20" rx="10" fill="#fff" opacity=".93"/><text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="11.5" font-weight="800" fill="#12306b">${t}</text></g>`; }));
+  return s;
+}
+function cowSVG(o){
+  const S=SPC.bov;
+  return `<rect width="640" height="370" fill="#fbfcfe"/>${SHADOW}<defs><clipPath id="cpB"><path d="${COW}"/></clipPath></defs>
+   <path d="${COWFAR}" fill="#4a2616"/><path d="${COWFAR}" fill="#000" opacity=".25"/><path d="M254,326 h18 v8 h-18z M518,326 h16 v8 h-16z" fill="url(#hoof)"/>
+   <path d="M550,112 C566,140 570,196 566,252" stroke="#5a2f1b" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M566,248 c-8,10 -8,26 0,34 c8,-8 10,-24 0,-34z" fill="#2b170d"/>
+   <path d="${COW}" fill="url(#cowB)"/><path d="${COW}" fill="#000" filter="url(#hair)"/>
+   <g clip-path="url(#cpB)" pointer-events="none">
+     <ellipse cx="250" cy="170" rx="70" ry="62" fill="#c27a50" opacity=".45" filter="url(#bl6)"/>
+     <ellipse cx="500" cy="160" rx="60" ry="64" fill="#c27a50" opacity=".4" filter="url(#bl6)"/>
+     <path d="M270,140 C300,170 300,220 280,250" stroke="#3a1d10" stroke-width="5" opacity=".25" fill="none" filter="url(#bl3)"/>
+     <path d="M462,120 C440,160 444,210 470,246" stroke="#3a1d10" stroke-width="6" opacity=".25" fill="none" filter="url(#bl3)"/>
+     ${[0,1,2,3].map(i=>`<path d="M${320+i*26},140 C${316+i*26},180 ${320+i*26},220 ${330+i*26},250" stroke="#3a1d10" stroke-width="3" opacity=".12" fill="none"/>`).join('')}
+     <rect x="0" y="220" width="640" height="60" fill="#2b170d" opacity=".25" filter="url(#bl6)"/>
+     <path d="M140,104 C200,96 330,98 470,92" stroke="#fff" stroke-width="10" opacity=".09" fill="none" filter="url(#bl3)"/>
+   </g>
+   ${regionsLayer('bov',S.cuts,'cpB',o)}
+   <path d="M40,182 C38,166 44,150 54,138 C62,126 74,116 88,110 C96,106 102,104 108,104 C112,116 108,126 100,132 C92,140 90,152 94,164 C98,176 104,188 106,198 C92,198 74,196 58,194 C46,192 40,190 40,182Z" fill="#f4efe6"/>
+   <path d="M40,182 C38,166 44,150 54,138 C62,126 74,116 88,110 C96,106 102,104 108,104 C112,116 108,126 100,132 C92,140 90,152 94,164 C98,176 104,188 106,198 C92,198 74,196 58,194 C46,192 40,190 40,182Z" fill="#000" filter="url(#hair)" opacity=".45"/>
+   <path d="M102,104 C96,92 100,82 110,78 C108,86 108,94 110,102Z" fill="#efe7d6" stroke="#b9a98a"/>
+   <path d="M112,110 C124,102 142,104 150,114 C140,122 122,122 112,110Z" fill="#8a4a2c" stroke="#5a2f1b"/><path d="M118,111 C128,106 138,108 144,114" stroke="#d9a07c" stroke-width="2" fill="none"/>
+   <ellipse cx="82" cy="140" rx="5.5" ry="4.5" fill="#1a0f08"/><circle cx="83.5" cy="138.5" r="1.5" fill="#fff"/>
+   <path d="M40,176 C40,168 46,164 54,166 C60,170 60,182 54,188 C46,190 40,186 40,176Z" fill="#d7a99a"/><ellipse cx="47" cy="174" rx="2.6" ry="3.4" fill="#4b2a1f"/>
+   <path d="M48,192 C60,196 74,196 84,194" stroke="#8a6a5a" stroke-width="1.6" fill="none"/>
+   <path d="${COW}" fill="none" stroke="#2b170d" stroke-width="1.8" pointer-events="none"/>
+   <path d="M214,326 h24 v10 h-24z M512,326 h24 v10 h-24z" fill="url(#hoof)"/>
+   ${labels(S.cuts)}`;
+}
+function pigSVG(o){
+  const S=SPC.por;
+  return `<rect width="640" height="370" fill="#fbfcfe"/>${SHADOW}<defs><clipPath id="cpP"><path d="${PIG}"/></clipPath></defs>
+   <path d="${PIGFAR}" fill="#d48b80"/><path d="${PIGFAR}" fill="#000" opacity=".15"/><path d="M224,306 h16 v8 h-16z M488,306 h16 v8 h-16z" fill="#7c4a42"/>
+   <path d="M546,150 c16,-8 24,6 14,12 c-10,6 -12,-8 0,-10 c8,-2 10,6 6,8" stroke="#d48b80" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+   <path d="${PIG}" fill="url(#pigB)"/><path d="${PIG}" fill="#9a4a40" filter="url(#pores)" opacity=".5"/>
+   <g clip-path="url(#cpP)" pointer-events="none">
+     <ellipse cx="200" cy="170" rx="66" ry="70" fill="#fff" opacity=".22" filter="url(#bl6)"/><ellipse cx="490" cy="168" rx="58" ry="64" fill="#fff" opacity=".2" filter="url(#bl6)"/>
+     <path d="M238,120 C256,160 256,210 236,250" stroke="#9a4a40" stroke-width="5" opacity=".18" fill="none" filter="url(#bl3)"/><path d="M452,112 C432,160 436,214 462,252" stroke="#9a4a40" stroke-width="5" opacity=".18" fill="none" filter="url(#bl3)"/>
+     <rect x="0" y="236" width="640" height="60" fill="#9a4a40" opacity=".22" filter="url(#bl6)"/>
+     ${[0,1,2].map(i=>`<path d="M${132+i*8},${150+i*14} q8 10 2 22" stroke="#b56a60" stroke-width="1.6" opacity=".5" fill="none"/>`).join('')}
+   </g>
+   ${regionsLayer('por',S.cuts,'cpP',o)}
+   <path d="M96,120 C88,96 100,78 122,72 C130,88 132,106 124,122 C114,124 104,124 96,120Z" fill="#f2b2a6" stroke="#c97f73" stroke-width="1.5"/><path d="M104,114 C102,98 110,86 120,82" stroke="#fff" stroke-width="2" opacity=".5" fill="none"/>
+   <ellipse cx="84" cy="142" rx="4.2" ry="3.6" fill="#1a0f08"/><circle cx="85.4" cy="140.6" r="1.3" fill="#fff"/><path d="M76,136 q8 -6 16 0" stroke="#b56a60" stroke-width="1.5" fill="none"/>
+   <ellipse cx="44" cy="172" rx="9" ry="17" fill="#f3b1a5" stroke="#c97f73" stroke-width="1.5"/><ellipse cx="43" cy="166" rx="2.2" ry="3.4" fill="#7f3b35"/><ellipse cx="43" cy="179" rx="2.2" ry="3.4" fill="#7f3b35"/>
+   <path d="M52,190 C64,194 76,196 86,194" stroke="#b56a60" stroke-width="1.6" fill="none"/>
+   <path d="${PIG}" fill="none" stroke="#b5665d" stroke-width="1.8" pointer-events="none"/>
+   <path d="M190,312 h24 v8 h-24z M504,312 h24 v8 h-24z" fill="#7c4a42"/><path d="M202,312 v8 M516,312 v8" stroke="#fbd3c9" stroke-width="1.5"/>
+   ${labels(S.cuts)}`;
+}
+function chickenSVG(o){
+  const S=SPC.pol, cuts=S.cuts;
+  const body='M214,150 C194,172 188,214 208,248 C232,280 288,292 350,290 C412,288 458,272 486,242 C502,224 510,202 512,182 C540,162 566,134 580,104 C562,110 540,118 520,130 C500,138 470,136 440,134 C380,130 300,126 256,128 C236,130 222,138 214,150Z';
+  const wing='M266,162 C296,144 380,142 434,162 C466,174 476,198 456,212 C424,226 360,222 318,208 C288,198 260,184 266,162Z';
+  const thigh='M392,214 C414,194 456,198 470,224 C482,248 468,274 440,282 C412,288 390,270 386,250 C384,236 384,222 392,214Z';
+  const drum='M408,276 C424,272 448,274 454,284 L448,310 C442,318 420,318 414,310Z';
+  const cl=(k,shape,clip)=>{const on=o.sel===k,fl=o.flash&&o.flash.k===k;const col=fl?(o.flash.ok?'#22c55e':'#ef4444'):(o.plain?'transparent':regionFill('pol',k));
+    return `<g class="rg" data-k="${k}" style="cursor:pointer" ${clip?`clip-path="url(#${clip})"`:''}><path d="${shape}" fill="${col}" fill-opacity="${fl?.8:o.plain?0:on?.72:(WORK?.7:.45)}" style="mix-blend-mode:${WORK||fl?'normal':'multiply'}"/>${o.plain?'':`<path d="${shape}" fill="none" stroke="${on?'#f05a28':'#fff'}" stroke-width="${on?4:2.2}" ${on?'':'stroke-dasharray="7 4"'}/>`}</g>`;};
+  const feathers=(n,x0,x1,y0,y1,seed)=>{const R=RNG(seed);let s='';for(let i=0;i<n;i++){const x=lerp(x0,x1,R()),y=lerp(y0,y1,R());s+=`<path d="M${x.toFixed(1)},${y.toFixed(1)} q8 4 16 0" stroke="#cbd5e1" stroke-width="1.2" fill="none" opacity=".7"/>`;}return s;};
+  return `<rect width="640" height="370" fill="#fbfcfe"/>${SHADOW}
+   <defs><clipPath id="cpCh"><path d="${body}"/></clipPath>
+    <radialGradient id="wF" cx=".42" cy=".35" r=".8"><stop offset="0" stop-color="#ffffff"/><stop offset=".7" stop-color="#eef2f7"/><stop offset="1" stop-color="#c8d1dc"/></radialGradient>
+    <linearGradient id="shank" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e2a632"/><stop offset=".5" stop-color="#fbd34d"/><stop offset="1" stop-color="#d79a24"/></linearGradient></defs>
+   <!-- patas -->
+   <path d="M396,300 L390,334 M396,300 L392,334" stroke="url(#shank)" stroke-width="7" stroke-linecap="round" opacity=".75"/>
+   <path d="M378,336 h26 M390,336 l-12,6" stroke="#d79a24" stroke-width="4" stroke-linecap="round" opacity=".75"/>
+   <path d="M432,308 L428,336" stroke="url(#shank)" stroke-width="8" stroke-linecap="round"/>
+   <path d="M412,338 h34 M428,338 l-16,7 M428,338 l14,6" stroke="#e2a632" stroke-width="4.5" stroke-linecap="round"/>
+   <!-- cola -->
+   <path d="M500,150 C530,120 560,92 590,84 C584,104 574,124 556,144 C580,128 600,118 612,120 C598,142 570,168 524,186Z" fill="url(#wF)" stroke="#cbd5e1" stroke-width="1.5"/>
+   <!-- cuerpo -->
+   <path d="${body}" fill="url(#wF)" stroke="#b8c2cf" stroke-width="1.6"/>
+   <g clip-path="url(#cpCh)" pointer-events="none">${feathers(60,220,500,140,280,7)}<rect x="180" y="240" width="340" height="60" fill="#94a3b8" opacity=".25" filter="url(#bl6)"/></g>
+   ${o.plain?'':''}
+   ${cl('pechuga','M170,168 L330,176 L392,214 L404,300 L170,300Z','cpCh')}
+   ${cl('huacal','M226,96 L440,96 L440,150 L300,176 L226,176Z','cpCh')}
+   ${cl('rabadilla','M440,96 L600,96 L600,250 L478,242 L440,150Z','cpCh')}
+   <!-- muslo y pierna -->
+   <path d="${thigh}" fill="url(#wF)" stroke="#b8c2cf" stroke-width="1.5"/>${feathers(10,396,462,214,272,3)}
+   ${cl('muslo',thigh)}
+   <path d="${drum}" fill="url(#wF)" stroke="#b8c2cf" stroke-width="1.5"/>
+   ${cl('pierna',drum)}
+   <!-- ala -->
+   <path d="${wing}" fill="url(#wF)" stroke="#b8c2cf" stroke-width="1.5"/>
+   ${[0,1,2,3,4].map(i=>`<path d="M${330+i*24},${158+i*2} C${340+i*24},${180+i*3} ${350+i*24},${196+i*2} ${360+i*22},${214}" stroke="#cbd5e1" stroke-width="1.4" fill="none" pointer-events="none"/>`).join('')}
+   ${cl('ala',wing)}
+   <!-- cuello y cabeza -->
+   <path d="M214,152 C204,130 202,110 208,94 C212,82 208,70 198,62 C190,54 196,40 212,36 C230,32 246,42 248,60 C252,80 246,104 250,124 C252,134 258,130 256,128 C240,136 226,144 214,152Z" fill="url(#wF)" stroke="#b8c2cf" stroke-width="1.5"/>
+   ${feathers(8,212,246,70,128,11)}
+   <path d="M204,40 C200,30 208,24 214,30 C214,20 224,18 226,28 C230,20 240,22 238,32 C246,28 250,36 244,42 C232,40 216,40 204,40Z" fill="#dc2626" stroke="#991b1b" stroke-width="1"/>
+   <path d="M200,56 L178,62 L200,70Z" fill="#f59e0b" stroke="#b45309" stroke-width="1"/>
+   <path d="M200,72 C194,80 194,92 202,96 C208,90 208,80 204,72Z" fill="#dc2626" stroke="#991b1b" stroke-width="1"/>
+   <circle cx="214" cy="52" r="4.2" fill="#78350f"/><circle cx="215.3" cy="50.7" r="1.3" fill="#fff"/>
+   <text x="262" y="64" font-size="11" fill="#94a3b8" font-weight="700">cuello</text><text x="448" y="352" font-size="11" fill="#94a3b8" font-weight="700">patas</text>
+   ${labels(cuts)}`;
+}
+function animalSVG(sp,o={}){ return sp==='bov'?cowSVG(o):sp==='por'?pigSVG(o):chickenSVG(o); }
+
+/* ===================== Canales abiertas ===================== */
+// media canal colgada (vista interna): la pierna arriba, el cuello abajo; columna a la derecha
+const BCAN='M286,40 C300,34 326,34 340,40 C354,64 384,86 408,110 C426,132 428,170 418,196 C412,214 410,240 410,270 C410,304 412,336 416,364 C418,384 410,400 392,410 C372,420 344,420 326,412 C312,420 296,424 280,424 C262,424 246,414 250,400 C254,390 266,384 276,378 C262,366 250,350 246,330 C240,300 238,270 242,246 C246,222 254,200 262,180 C268,160 270,140 276,116 C280,90 282,64 286,40Z';
+const PCAN='M290,44 C302,38 324,38 336,44 C348,66 376,86 398,110 C414,130 418,164 410,190 C404,210 402,236 402,264 C402,296 404,326 406,352 C408,372 396,388 378,394 C358,400 336,398 320,392 C306,400 292,404 278,402 C262,400 254,390 258,378 C262,368 272,362 280,356 C266,344 256,326 252,306 C246,278 246,252 250,228 C254,206 260,188 266,170 C272,150 274,130 278,108 C282,86 286,64 290,44Z';
+const CANP={
+ bov:{pierna:'200,0 470,0 470,196 200,196',lomo:'322,196 470,196 470,262 322,262',aldilla:'200,196 322,196 330,262 200,262',chuleton:'330,262 470,262 470,346 330,346',pecho:'200,262 330,262 330,346 306,376 200,376',paleta:'306,376 330,346 470,346 470,440 300,440 M200,376 306,376 300,440 200,440'},
+ por:{pierna:'200,0 470,0 470,192 200,192',entrecot:'330,192 470,192 470,330 330,330',costillar:'200,192 330,192 330,330 200,330',espaldilla:'200,330 382,330 382,420 200,420',cablomo:'382,330 470,330 470,420 382,420'}};
+const CANL={bov:{pierna:[[490,110,'Pierna o piña']],lomo:[[490,226,'Lomo corto']],aldilla:[[150,228,'Aldilla o falda']],chuleton:[[490,304,'Chuletón']],pecho:[[150,320,'Chaleco y pecho']],paleta:[[490,400,'Paleta']]},
+ por:{pierna:[[490,120,'Pierna']],entrecot:[[490,262,'Entrecot']],costillar:[[150,262,'Costillar']],espaldilla:[[150,372,'Espaldilla']],cablomo:[[490,374,'Cabeza de lomo']]}};
+const CANX={bov:{pierna:[330,110],lomo:[380,228],aldilla:[270,228],chuleton:[380,304],pecho:[268,320],paleta:[380,400]},
+ por:{pierna:[330,120],entrecot:[372,262],costillar:[290,262],espaldilla:[300,372],cablomo:[404,372]}};
+let STRUCT=false;
+function carcassSVG(sp,o={}){
+  const out=sp==='bov'?BCAN:PCAN, por=sp==='por', meat=por?'url(#meatP)':'url(#meatC)', fat=por?'#fbeee2':'#f3e3c4';
+  const regs=Object.fromEntries(Object.entries(SPC[sp].cuts).filter(([k])=>CANP[sp][k]).map(([k,c])=>[k,Object.assign({},c,{cpoly:CANP[sp][k]})]));
+  let ribs='';const y0=por?204:264, y1=por?328:344, n=por?9:7;
+  for(let i=0;i<n;i++){const y=lerp(y0,y1,i/(n-1)); ribs+=`<path d="M404,${y} C370,${y-6} 320,${y+2} ${por?262:272},${y+18}" stroke="#f5ead6" stroke-width="${por?6:8}" stroke-linecap="round" fill="none"/><path d="M404,${y+3} C370,${y-3} 320,${y+5} ${por?262:272},${y+21}" stroke="#c9b28a" stroke-width="1.2" fill="none" opacity=".6"/>`;}
+  let vert='';const vy0=por?150:186, vy1=por?388:404;for(let y=vy0;y<vy1;y+=por?12:14) vert+=`<rect x="${por?394:398}" y="${y}" width="${por?14:16}" height="${por?10:12}" rx="3" fill="url(#boneC)" stroke="#c9b28a" stroke-width=".8"/>`;
+  let s=`<rect width="640" height="440" fill="#fbfcfe"/>
+   <rect x="180" y="6" width="280" height="10" rx="4" fill="url(#steelR)"/><path d="M313,16 v14 M313,30 c-10,0 -12,12 -2,14" stroke="#6b7280" stroke-width="4" fill="none" stroke-linecap="round"/>
+   <defs><clipPath id="cc${sp}"><path d="${out}"/></clipPath></defs>
+   <path d="${out}" transform="translate(6,8)" fill="#000" opacity=".18" filter="url(#bl6)"/>
+   <path d="${out}" fill="${fat}"/>
+   <g clip-path="url(#cc${sp})">
+     <path d="${out}" transform="translate(${por?320:330},230) scale(.92) translate(-${por?320:330},-230)" fill="${meat}"/>
+     <rect x="200" y="20" width="260" height="420" fill="#000" filter="url(#mus)" opacity=".5"/>
+     ${ribs}
+     ${por?'':`<path d="M410,262 C380,250 330,252 260,266" stroke="#7d1d27" stroke-width="7" fill="none" opacity=".85"/>`}
+     ${[['M300,60 C320,100 318,150 296,190',4],['M340,70 C356,110 352,160 330,196',3],['M268,120 C296,130 320,150 330,190',3],['M330,352 C350,370 370,380 400,384',3],['M290,350 C300,370 300,388 292,402',3]].map(([d,w])=>`<path d="${d}" stroke="${fat}" stroke-width="${w}" fill="none" opacity=".75"/>`).join('')}
+     <ellipse cx="${por?378:384}" cy="${por?176:206}" rx="${por?20:24}" ry="${por?30:34}" fill="${fat}" stroke="#e2cfa8"/>
+     <path d="M${por?352:356},${por?92:96} C${por?372:378},${por?104:110} ${por?380:388},${por?126:132} ${por?370:378},${por?150:156} C${por?356:362},${por?150:156} ${por?344:350},${por?132:138} ${por?346:350},${por?112:116}Z" fill="url(#boneC)" stroke="#c9b28a"/>
+     ${vert}
+     <rect x="200" y="20" width="260" height="420" fill="#fff" opacity=".06" style="mix-blend-mode:screen"/>
+   </g>
+   ${por?`<path d="${out}" fill="none" stroke="#f6c9bd" stroke-width="5" opacity=".9"/>`:''}
+   <path d="${out}" fill="none" stroke="${por?'#d39a8f':'#cdb48c'}" stroke-width="1.6"/>`;
+  // regiones
+  s+=Object.entries(regs).map(([k,c])=>{ const on=o.sel===k; const polys=c.cpoly.split(' M').map(p=>`<polygon points="${p.replace('M','')}"/>`).join('');
+    return `<g class="rg" data-k="${k}" clip-path="url(#cc${sp})" style="cursor:pointer"><g fill="${regionFill(sp,k)}" opacity="${on?.62:((WORK||(QUART&&sp==='bov'))?.55:.0001)}">${polys}</g>${on?`<g fill="none" stroke="#f05a28" stroke-width="4">${polys}</g>`:''}</g>`; }).join('');
+  s+=`<g clip-path="url(#cc${sp})" fill="none" stroke="#fff" stroke-width="2.4" stroke-dasharray="7 4" pointer-events="none">${Object.values(regs).map(c=>c.cpoly.split(' M').map(p=>`<polygon points="${p.replace('M','')}"/>`).join('')).join('')}</g>`;
+  if(NAMES) Object.entries(CANL[sp]).forEach(([k,arr])=>arr.forEach(([x,y,t],i)=>{ const [tx,ty]=CANX[sp][i?k+'2':k]; const w=t.length*6.6+14, left=x<320;
+    s+=`<g pointer-events="none"><path d="M${tx},${ty} L${left?x+w/2:x-w/2},${y}" stroke="#12306b" stroke-width="1.2"/><circle cx="${tx}" cy="${ty}" r="3" fill="#12306b"/><rect x="${x-w/2}" y="${y-11}" width="${w}" height="20" rx="10" fill="#fff" stroke="#12306b"/><text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="11.5" font-weight="800" fill="#12306b">${t}</text></g>`; }));
+  if(!por&&(QUART||o.qline)) s+=`<line x1="200" x2="470" y1="262" y2="262" stroke="#f05a28" stroke-width="3" clip-path="url(#cc${sp})"/><g pointer-events="none"><rect x="470" y="252" width="156" height="20" rx="10" fill="#fff7ed" stroke="#f05a28"/><text x="548" y="266" text-anchor="middle" font-size="11" font-weight="800" fill="#c2410c">Cuarteo · 12.ª costilla</text></g>`;
+  if(STRUCT){ const L=por?[[400,120,'Columna (vértebras partidas)',600],[380,176,'Riñonada (grasa)',600],[362,124,'Hueso de la cadera',40],[300,280,'Costillas',40]]:[[406,150,'Columna (vértebras partidas)',600],[384,206,'Riñonada (grasa)',600],[366,128,'Hueso de la cadera',40],[300,300,'Costillas',40],[300,258,'Diafragma (arrachera)',40]];
+    L.forEach(([x,y,t,lx],i)=>{ const w=t.length*6.3+14, ly=24+i*24; s+=`<g pointer-events="none"><path d="M${x},${y} L${lx<320?lx+w:lx-w},${ly}" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="3 3"/><rect x="${lx<320?lx:lx-w}" y="${ly-10}" width="${w}" height="20" rx="10" fill="#f5f3ff" stroke="#7c3aed"/><text x="${lx<320?lx+w/2:lx-w/2}" y="${ly+4}" text-anchor="middle" font-size="11" font-weight="800" fill="#6d28d9">${t}</text></g>`; }); }
+  return s;
+}
+function chickenCanalSVG(o){
+  const cuts=SPC.pol.cuts;
+  const cl=k=>{const on=o.sel===k;return `class="rg" data-k="${k}" style="cursor:pointer" fill="${regionFill('pol',k)}" fill-opacity="${on?.7:(WORK?.65:.32)}" stroke="${on?'#f05a28':'#fff'}" stroke-width="${on?4:2}" ${on?'':'stroke-dasharray="6 4"'}`;};
+  const view=(x0,dorsal)=>{ const T=`translate(${x0},0)`;
+    let g=`<g transform="${T}">
+     <path d="M-92,266 C-104,284 -106,306 -98,324 C-94,334 -84,336 -80,326 C-78,306 -76,288 -70,274Z" fill="url(#chkB)" stroke="#c99a70"/><path d="M92,266 C104,284 106,306 98,324 C94,334 84,336 80,326 C78,306 76,288 70,274Z" fill="url(#chkB)" stroke="#c99a70"/>
+     <path d="M-98,324 c-4,12 6,18 14,12 M98,324 c4,12 -6,18 -14,12" stroke="#c99a70" fill="#f6e9d6"/>
+     <path d="M-62,98 C-104,92 -128,128 -120,170 C-116,190 -104,206 -92,212 C-90,190 -80,150 -62,128Z" fill="url(#chkB)" stroke="#c99a70"/><path d="M62,98 C104,92 128,128 120,170 C116,190 104,206 92,212 C90,190 80,150 62,128Z" fill="url(#chkB)" stroke="#c99a70"/>
+     <path d="M-60,96 C-40,70 40,70 60,96 C84,130 90,190 76,236 C62,274 30,290 0,290 C-30,290 -62,274 -76,236 C-90,190 -84,130 -60,96Z" fill="url(#chkB)" stroke="#c99a70" stroke-width="1.5"/>
+     <path d="M-60,96 C-40,70 40,70 60,96 C84,130 90,190 76,236 C62,274 30,290 0,290 C-30,290 -62,274 -76,236 C-90,190 -84,130 -60,96Z" fill="#000" filter="url(#pores)" opacity=".6"/>
+     <path d="M-16,72 C-14,56 14,56 16,72Z" fill="#e8c4a0" stroke="#c99a70"/>`;
+    if(!dorsal){
+      g+=`<path d="M0,84 C-50,88 -74,150 -64,214 L-40,234 L0,238Z" ${cl('pechuga')}/><path d="M0,84 C50,88 74,150 64,214 L40,234 L0,238Z" ${cl('pechuga')}/>
+       <path d="M0,86 L0,236" stroke="#d9b08a" stroke-width="2.4" pointer-events="none"/><ellipse cx="-28" cy="150" rx="18" ry="40" fill="#fff" opacity=".22" pointer-events="none"/><ellipse cx="28" cy="150" rx="18" ry="40" fill="#fff" opacity=".22" pointer-events="none"/>
+
+       <ellipse cx="0" cy="262" rx="16" ry="10" fill="#c99a70" opacity=".5" pointer-events="none"/>`;
+    } else {
+      g+=`<path d="M-62,98 C-40,74 40,74 62,98 C76,124 78,160 72,182 L-72,182 C-78,160 -76,124 -62,98Z" ${cl('huacal')}/>
+       <path d="M-72,182 L72,182 C70,226 52,262 26,280 L-26,280 C-52,262 -70,226 -72,182Z" ${cl('rabadilla')}/>
+       <path d="M0,90 L0,270" stroke="#d9b08a" stroke-width="2" stroke-dasharray="3 5" pointer-events="none"/><path d="M-10,282 C-8,298 8,298 10,282Z" fill="url(#chkB)" stroke="#c99a70"/>
+`;
+    }
+    g+=`<path d="M-64,196 C-92,200 -110,228 -104,254 C-100,272 -84,280 -66,276 C-52,272 -42,258 -40,240 C-40,222 -50,204 -64,196Z" fill="url(#chkB)" stroke="#c99a70"/><path d="M64,196 C92,200 110,228 104,254 C100,272 84,280 66,276 C52,272 42,258 40,240 C40,222 50,204 64,196Z" fill="url(#chkB)" stroke="#c99a70"/>
+     <path d="M-64,196 C-92,200 -110,228 -104,254 C-100,272 -84,280 -66,276 C-52,272 -42,258 -40,240 C-40,222 -50,204 -64,196Z" ${cl('muslo')}/><path d="M64,196 C92,200 110,228 104,254 C100,272 84,280 66,276 C52,272 42,258 40,240 C40,222 50,204 64,196Z" ${cl('muslo')}/>
+     <path d="M-92,266 C-104,284 -106,306 -98,324 C-94,334 -84,336 -80,326 C-78,306 -76,288 -70,274Z" ${cl('pierna')}/><path d="M92,266 C104,284 106,306 98,324 C94,334 84,336 80,326 C78,306 76,288 70,274Z" ${cl('pierna')}/>
+     <path d="M-62,98 C-104,92 -128,128 -120,170 C-116,190 -104,206 -92,212 C-90,190 -80,150 -62,128Z" ${cl('ala')}/><path d="M62,98 C104,92 128,128 120,170 C116,190 104,206 92,212 C90,190 80,150 62,128Z" ${cl('ala')}/>
+     <text x="0" y="360" text-anchor="middle" font-size="12.5" font-weight="800" fill="#475569">${dorsal?'Vista dorsal (espalda)':'Vista ventral (pecho)'}</text></g>`;
+    return g; };
+  let s=`<rect width="640" height="440" fill="#fbfcfe"/><ellipse cx="170" cy="344" rx="120" ry="10" fill="#000" opacity=".08" filter="url(#bl6)"/><ellipse cx="470" cy="344" rx="120" ry="10" fill="#000" opacity=".08" filter="url(#bl6)"/>`+view(170,false)+view(470,true);
+  if(NAMES){ const L=[[170,170,'Pechuga'],[56,140,'Ala'],[90,236,'Muslo'],[60,300,'Pierna'],[470,136,'Huacal'],[470,232,'Rabadilla'],[584,140,'Ala'],[550,236,'Muslo'],[580,300,'Pierna']];
+    L.forEach(([x,y,t])=>{const w=t.length*6.6+14;s+=`<g pointer-events="none"><rect x="${x-w/2}" y="${y-11}" width="${w}" height="20" rx="10" fill="#fff" opacity=".93"/><text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="11.5" font-weight="800" fill="#12306b">${t}</text></g>`;}); }
+  return s;
+}
+
+/* ===================== 1 · EXPLORA ===================== */
+function cutInfoHTML(sp,sel){ const S=SPC[sp], c=sel&&S.cuts[sel];
+  return c?`<h3>${S.e} ${c.n}${c.en?` <small style="color:var(--muted);font-weight:700">(<i>${c.en}</i>)</small>`:''}</h3><span class="size" style="background:${W3[c.w][2]};color:#111">💪 Trabajo del músculo: ${W3[c.w][0]}</span>${c.q?` <span class="size" style="background:${QCOL[c.q]};color:#fff">Cuarto ${c.q.toLowerCase()}</span>`:''}
+    <div class="info" style="margin-top:6px">${c.def?`<div><span>Definición (NMX-FF-081)</span><b>${c.def}</b></div>`:''}<div><span>Zona</span><b>${c.zona}</b></div><div><span>Textura</span><b>${c.tex}</b></div><div><span>${sp==='pol'?'Piezas de venta':'Cortes comerciales'}</span><b>${c.com||c.venta}</b></div><div><span>Uso o cocción</span><b>${c.uso}</b></div></div>
+    <div class="meat" style="margin-top:8px">${c.w===1?'Músculo de poco trabajo: poco colágeno → suave → cocción rápida.':c.w===3?'Músculo de mucho trabajo: mucho colágeno → duro → cocción larga en medio húmedo.':'Trabajo intermedio: se adapta a varios métodos; las cocciones lentas lo suavizan.'}</div>`
+    :`<h3>${S.e} ${S.n}</h3><p style="font-size:13px">Toca una zona del dibujo o un nombre de la lista para ver su información.</p><div class="ctx">${sp==='pol'?'Piezas según la NMX-FF-128-SCFI-2016 (Tabla 6). En el taller trabajarás el despiece de pollo por costo y facilidad de manejo.':sp==='bov'?'Cortes primarios y comerciales según la Tabla 2 (Calderón Alonso et al., 2021). La media canal se divide a la altura de la 12.ª costilla en cuarto delantero y cuarto trasero.':'Cortes primarios según la NMX-FF-081-SCFI-2003 (Tabla 4). La cabeza no forma parte de los cortes primarios.'}</div>`; }
+
+function drawExp(){
+  const S=SPC[SPx];
+  $('#anim').innerHTML=animalSVG(SPx,{sel:SEL});
+  $$('#anim .rg').forEach(g=>g.onclick=()=>{SEL=g.dataset.k;drawExp();});
+  $('#animCap').textContent=SPx==='pol'?'Pollo de engorda: piezas según la NMX-FF-128-SCFI-2016 (Tabla 6).':SPx==='bov'?(QUART?'Bovino: cuarto delantero (verde) y cuarto trasero (azul), separados a la altura de la 12.ª costilla.':'Bovino: cortes primarios según la Tabla 2 (Calderón Alonso et al., 2021).'):'Porcino: cortes primarios según la NMX-FF-081-SCFI-2003 (Tabla 4).';
+  $('#tQuart').style.display=SPx==='bov'?'':'none';
+  $('#cutList').innerHTML=Object.entries(S.cuts).map(([k,c],i)=>`<button class="rung ${SEL===k?'on':''}" data-k="${k}"><i style="background:${regionFill(SPx,k)};color:#fff">${i+1}</i><span>${c.n}</span><small>${W3[c.w][0]}</small></button>`).join('');
+  $$('#cutList .rung').forEach(b=>b.onclick=()=>{SEL=b.dataset.k;drawExp();});
+  $('#cutInfo').innerHTML=cutInfoHTML(SPx,SEL);
+  $('#workLeg').style.display=WORK?'flex':'none';
+  $('#workLeg').style.display=(WORK||(QUART&&SPx==='bov'))?'flex':'none';
+  $('#workLeg').innerHTML=WORK?[1,2,3].map(k=>`<span><span class="swatch" style="background:${W3[k][1]}"></span>Trabajo ${W3[k][0].toLowerCase()}</span>`).join(''):Object.entries(QCOL).map(([q,c])=>`<span><span class="swatch" style="background:${c}"></span>Cuarto ${q.toLowerCase()}</span>`).join('');
+}
+$$('[data-sp]').forEach(b=>b.onclick=()=>{SPx=b.dataset.sp;SEL=null;$$('[data-sp]').forEach(x=>x.classList.toggle('on',x===b));drawExp();});
+$('#tWork').onclick=e=>{WORK=!WORK;if(WORK){QUART=false;$('#tQuart').classList.remove('on');$('#tQuart2').classList.remove('on');}e.currentTarget.classList.toggle('on',WORK);$('#tWork2').classList.toggle('on',WORK);drawExp();drawCan();};
+$('#tQuart').onclick=$('#tQuart2').onclick=()=>{QUART=!QUART;if(QUART){WORK=false;$('#tWork').classList.remove('on');$('#tWork2').classList.remove('on');}$('#tQuart').classList.toggle('on',QUART);$('#tQuart2').classList.toggle('on',QUART);drawExp();drawCan();};
+$('#tNames').onclick=e=>{NAMES=!NAMES;e.currentTarget.classList.toggle('on',NAMES);drawExp();};
+
+
+/* ===================== CANALES ABIERTAS ===================== */
+let CSP='bov', CSEL=null;
+function drawCan(){
+  $('#can').innerHTML=CSP==='pol'?chickenCanalSVG({sel:CSEL}):carcassSVG(CSP,{sel:CSEL});
+  $$('#can .rg').forEach(g=>g.onclick=()=>{CSEL=g.dataset.k;drawCan();});
+  $('#canCap').textContent=CSP==='bov'?'Media canal de bovino colgada (cara interna): la pierna arriba, el cuello abajo y la columna partida a la derecha. El cuarteo se hace a la altura de la 12.ª costilla.':CSP==='por'?'Media canal de porcino colgada (cara interna, sin cabeza): conserva la piel en el borde.':'Canal de pollo eviscerada: vista del pecho y de la espalda, con las piezas de la NMX-FF-128-SCFI-2016.';
+  $('#canInfo').innerHTML=cutInfoHTML(CSP,CSEL);
+  $('#canList').innerHTML=Object.entries(SPC[CSP].cuts).filter(([k])=>CSP==='pol'||CANP[CSP][k]).map(([k,c],i)=>`<button class="rung ${CSEL===k?'on':''}" data-k="${k}"><i style="background:${regionFill(CSP,k)};color:#fff">${i+1}</i><span>${c.n}</span><small>${W3[c.w][0]}</small></button>`).join('');
+  $$('#canList .rung').forEach(b=>b.onclick=()=>{CSEL=b.dataset.k;drawCan();});
+  $('#tStruct').style.display=CSP==='pol'?'none':''; $('#tQuart2').style.display=CSP==='bov'?'':'none';
+}
+$$('[data-csp]').forEach(b=>b.onclick=()=>{CSP=b.dataset.csp;CSEL=null;$$('[data-csp]').forEach(x=>x.classList.toggle('on',x===b));drawCan();});
+$('#tStruct').onclick=e=>{STRUCT=!STRUCT;e.currentTarget.classList.toggle('on',STRUCT);drawCan();};
+$('#tWork2').onclick=()=>$('#tWork').onclick({currentTarget:$('#tWork')});
+$('#tNames2').onclick=e=>{NAMES=!NAMES;e.currentTarget.classList.toggle('on',NAMES);$('#tNames').classList.toggle('on',NAMES);drawCan();drawExp();};
+
+/* ===================== 2 · RETO ===================== */
+let RQ=[], rI=0, rOk=0, rBad=0, rTry=0, rDone=false;
+function newRet(){ RQ=[]; ['bov','por','pol'].forEach(sp=>shuffle(Object.keys(SPC[sp].cuts)).slice(0,4).forEach(k=>RQ.push([sp,k]))); RQ=shuffle(RQ); rI=0; rOk=0; rBad=0; drawRet(); }
+function drawRet(fl){
+  if(rI>=RQ.length){ $('#rAsk').textContent='¡Terminaste!'; $('#rFb').innerHTML=`<div class="fb ${rOk>=10?'good':'mid'}">Acertaste <b>${rOk} de ${RQ.length}</b> al primer intento.</div>`; $('#rAnim').innerHTML=animalSVG('bov',{}); return; }
+  const [sp,k]=RQ[rI], c=SPC[sp].cuts[k]; const nm=NAMES; NAMES=false;
+  $('#rAnim').innerHTML=animalSVG(sp,{flash:fl,sel:fl&&fl.ok?k:null}); NAMES=nm;
+  $('#rAsk').innerHTML=`${SPC[sp].e} ${c.n}`; $('#rN').textContent=`${rI+1}/${RQ.length}`; $('#rOk').textContent=rOk; $('#rBad').textContent=rBad;
+  if(!fl){ rTry=0; rDone=false; $('#rFb').innerHTML=''; }
+  $$('#rAnim .rg').forEach(g=>g.onclick=()=>{ if(rDone) return; const ok=g.dataset.k===k;
+    if(ok){ if(rTry===0) rOk++; rDone=true; $('#rFb').innerHTML=`<div class="fb good">✓ ¡Correcto! ${c.zona}.</div>`; drawRet({k,ok:true}); setTimeout(()=>{rI++;drawRet();},1100); }
+    else { rTry++; rBad++; const w=SPC[sp].cuts[g.dataset.k]; $('#rFb').innerHTML=`<div class="fb bad">✗ Esa zona es <b>${w.n}</b>. Intenta de nuevo.</div>`; drawRet({k:g.dataset.k,ok:false}); } });
+}
+$('#rSkip').onclick=()=>{ rI++; drawRet(); };
+$('#rRst').onclick=newRet;
+
+/* ===================== 3 · COCINA + V/F ===================== */
+const NCK=9, NVF=5, TOTCP=NCK+NVF;
+const SC={ck:0,vf:0}; function tot(){const t=SC.ck+SC.vf;$('#totScore').textContent=`${t} de ${TOTCP} aciertos`;$('#totBar').style.width=(t/TOTCP*100)+'%';}
+const CK=shuffle([['bov','Filete','lomo'],['bov','Cuete o gusano','pierna'],['bov','Diezmillo','paleta'],['bov','Suadero','aldilla'],['bov','Costilla corta','chuleton'],['bov','Pecho sin hueso','pecho'],['por','Chuleta','entrecot'],['por','Tocino','costillar'],['por','Jamón','pierna']]);
+$('#ck').innerHTML=CK.map((q,i)=>{const S=SPC[q[0]];return `<div class="mrow" id="ck${i}" style="grid-template-columns:auto 1fr auto"><span style="font-size:20px">${S.e}</span><span><b style="font-size:14px">${q[1]}</b> <small style="color:var(--muted)">(${S.n.toLowerCase()})</small><br><select style="margin-top:4px"><option value="">— corte primario —</option>${shuffle(Object.entries(S.cuts)).map(([k,c])=>`<option value="${k}">${c.n}</option>`).join('')}</select><div class="ckfb" style="font-size:12.3px;margin-top:4px"></div></span><span class="mk" style="font-weight:900"></span></div>`;}).join('')+`<div class="row-btn"><button class="btn btn-primary btn-sm" id="ckChk">Revisar</button></div>`;
+$('#ckChk').onclick=()=>{ let ok=0; CK.forEach((q,i)=>{ const r=$('#ck'+i), v=r.querySelector('select').value, g=v===q[2], c=SPC[q[0]].cuts[q[2]];
+  r.classList.toggle('ok',g); r.classList.toggle('no',!g); r.querySelector('.mk').textContent=g?'✓':'✗';
+  r.querySelector('.ckfb').innerHTML=`${g?'':'Sale de: <b>'+c.n+'</b>. '}${c.q?'Cuarto '+c.q.toLowerCase()+' · ':''}Zona: ${c.zona.toLowerCase()} · Textura: ${c.tex.toLowerCase()}.`; if(g) ok++; });
+  SC.ck=ok; tot(); };
+const VF=[['Los nombres y la forma de los cortes son iguales en todos los países.',false,'Falso: varían entre países y regiones, pero la lógica (zonas anatómicas) es la misma.'],
+ ['La media canal de bovino se divide en cuarto delantero y cuarto trasero a la altura de la 12.ª costilla.',true,'Verdadero (Calderón Alonso et al., 2021).'],
+ ['El chuletón (rib) pertenece al cuarto trasero.',false,'Falso: chuletón, paleta, y chaleco y pecho forman el cuarto delantero; pierna, lomo corto y aldilla, el trasero.'],
+ ['Según la NMX-FF-081, la cabeza de lomo es la porción del músculo gran dorsal que cubre las vértebras cervicales.',true,'Verdadero: cubre las nueve vértebras cervicales.'],
+ ['La pechuga de pollo es un músculo de mucho trabajo, por eso es dura.',false,'Falso: el pollo de engorda casi no vuela; la pechuga es suave.']];
+$('#vf').innerHTML=VF.map((q,i)=>`<div class="cr" id="vf${i}"><span>${q[0]}</span><span class="tg"><button class="y" data-v="1">V</button><button class="n" data-v="0">F</button></span></div>`).join('');
+VF.forEach((q,i)=>{const r=$('#vf'+i);r.querySelectorAll('button').forEach(b=>b.onclick=()=>{const g=(b.dataset.v==='1')===q[1];r.querySelectorAll('button').forEach(x=>x.disabled=true);b.classList.add('on');r.insertAdjacentHTML('beforeend',`<div class="ex ${g?'good':'bad'}">${g?'✓ ':'✗ '}${q[2]}</div>`);if(g){SC.vf++;tot();}});});
+
+function show(t){$$('.tab').forEach(x=>x.classList.toggle('on',x.dataset.t===t));$$('.pane').forEach(p=>p.classList.toggle('show',p.dataset.p===t));window.scrollTo({top:0,behavior:'smooth'});}
+$$('.tab').forEach(b=>b.onclick=()=>show(b.dataset.t));
+drawExp(); drawCan(); newRet(); tot();
+</script>
+</body>
+</html>
